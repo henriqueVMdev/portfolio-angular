@@ -1,0 +1,6 @@
+flowchart TB
+    routes["Rotas com guard<br/>por papel"] --> layout["Layout autenticado"]
+    layout --> screens["Telas: catálogo, retirada,<br/>aprovações, painel,<br/>administração"]
+    screens --> shared["Regras compartilhadas<br/>datas · estoque · mensagens"]
+    shared --> client["Cliente Supabase<br/>sessão e perfil"]
+    client --> services["Auth · PostgreSQL · Storage"]

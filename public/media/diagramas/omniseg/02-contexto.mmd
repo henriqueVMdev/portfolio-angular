@@ -1,0 +1,12 @@
+flowchart LR
+    user["Usuário"] -->|"HTTPS"| spa["SPA Vue<br/>arquivos estáticos"]
+    subgraph security["Fronteira de segurança"]
+      auth["Auth"]
+      rest["PostgREST"]
+      storage["Storage"]
+      db[("PostgreSQL<br/>RLS e constraints")]
+      rest --> db
+    end
+    spa -->|"sessão"| auth
+    spa -->|"consultas e mutações"| rest
+    spa -->|"imagens"| storage

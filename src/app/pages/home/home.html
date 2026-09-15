@@ -1,0 +1,132 @@
+<main class="portfolio-shell">
+  <header
+    #nav
+    class="mint-nav"
+    [class.mint-nav--open]="menuOpen()"
+    [attr.data-on-surface]="'dark'"
+  >
+    <a class="mint-nav__mark" href="#inicio" aria-label="Voltar ao início">
+      <span aria-hidden="true">ΤΔ</span>
+      <span class="mint-nav__mark-copy">
+        <strong>{{ profile.name }}</strong>
+        <small>PORTFÓLIO / 2026</small>
+      </span>
+    </a>
+
+    <nav class="mint-nav__desktop" aria-label="Navegação principal">
+      @for (item of navigation.slice(1); track item.href) {
+        <a [href]="item.href">{{ item.label }}</a>
+      }
+    </nav>
+
+    <button
+      #menuButton
+      class="mint-nav__toggle"
+      type="button"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="mobile-navigation"
+      (click)="toggleMenu()"
+    >
+      <span>{{ menuOpen() ? 'Fechar' : 'Menu' }}</span>
+      <i aria-hidden="true"></i>
+    </button>
+
+    <div
+      #mobileMenu
+      id="mobile-navigation"
+      class="mint-menu"
+      [attr.aria-hidden]="!menuOpen()"
+    >
+      <p>ÍNDICE / TÉTRADRACHMA DIGITAL</p>
+      <nav aria-label="Navegação móvel">
+        @for (item of navigation; track item.href; let index = $index) {
+          <a
+            [href]="item.href"
+            [attr.tabindex]="menuOpen() ? 0 : -1"
+            (click)="closeMenu()"
+          >
+            <span>{{ index.toString().padStart(2, '0') }}</span>
+            {{ item.label }}
+          </a>
+        }
+      </nav>
+      <p class="mint-menu__footer">ESC fecha o índice</p>
+    </div>
+  </header>
+
+  <div class="hero-stage" #heroStage [attr.data-header-surface]="'dark'">
+    <span id="inicio" class="hero-scroll-anchor" aria-hidden="true"></span>
+    <section class="hero" aria-labelledby="hero-title">
+      <div
+        class="cinematic-media timed-hero-media hero-media"
+        [class.timed-hero-media--ready]="heroReady()"
+        aria-hidden="true"
+      >
+        <img
+          class="timed-hero-media__poster"
+          src="/media/hero-1920-poster.jpg"
+          alt=""
+          decoding="async"
+          fetchpriority="high"
+          draggable="false"
+        />
+        @if (heroSource()) {
+          <video
+            #heroVideo
+            class="cinematic-media__video timed-hero-media__video"
+            [src]="heroSource()"
+            muted
+            autoplay
+            playsinline
+            preload="auto"
+            poster="/media/hero-1920-poster.jpg"
+            tabindex="-1"
+            disablePictureInPicture
+            (error)="onHeroError()"
+          ></video>
+        }
+      </div>
+      <app-hero-particles
+        [lightMask]="heroParticles.lightMask"
+        [textSafeZone]="heroParticles.textSafeZone"
+      />
+      <div class="hero__field" aria-hidden="true"></div>
+      <div class="hero__datum" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <p class="hero__role" data-hero-reveal>
+        <span>ENGENHARIA DE SOFTWARE</span>
+        <strong>{{ profile.role }}</strong>
+      </p>
+
+      <h1 id="hero-title" class="hero__name" [attr.aria-label]="profile.name">
+        <span data-hero-reveal>{{ firstName }}</span>
+        <span data-hero-reveal>{{ remainingName }}</span>
+      </h1>
+
+      <div class="hero__copy" data-hero-reveal>
+        <p>{{ profile.statement }}</p>
+        <span>Projetos demonstrativos, arquitetura e decisões de engenharia.</span>
+      </div>
+
+      <div class="hero__actions" data-hero-reveal>
+        <a class="mint-link mint-link--primary" href="#projetos">
+          <span>Explorar projetos</span>
+          <span aria-hidden="true">↘</span>
+        </a>
+        <a class="mint-link" href="#contato">
+          <span>Iniciar conversa</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+
+      <p class="hero__scroll" aria-hidden="true">
+        <span>CONTINUE PARA EXPLORAR</span>
+        <i></i>
+      </p>
+    </section>
+  </div>
+</main>

@@ -1,0 +1,54 @@
+<svg viewBox="0 0 760 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="omni-layers-title omni-layers-desc">
+  <title id="omni-layers-title">Camadas do cliente OmniSeg</title>
+  <desc id="omni-layers-desc">Rotas com guard por papel carregam o layout autenticado. O layout organiza as telas de catálogo, retirada, aprovações, painel e administração. As telas usam regras compartilhadas para datas, estoque e mensagens; essas regras acessam o cliente Supabase, que mantém sessão e perfil e conecta Auth, PostgreSQL e Storage.</desc>
+  <style>
+    .node rect { fill: transparent; stroke: var(--planta-line, color-mix(in srgb, currentColor 35%, transparent)); stroke-width: 1.5; }
+    .node--accent rect { fill: color-mix(in srgb, var(--planta-accent, #c07a3e) 10%, transparent); stroke: var(--planta-accent, #c07a3e); }
+    .node text { fill: var(--planta-ink, currentColor); font: 500 16px ui-monospace, SFMono-Regular, Menlo, monospace; text-anchor: middle; }
+    .node .subline { font-size: 13px; fill: var(--planta-muted, color-mix(in srgb, currentColor 55%, transparent)); }
+    .edge { fill: none; stroke: var(--planta-line, color-mix(in srgb, currentColor 35%, transparent)); stroke-width: 1.5; marker-end: url(#omni-layers-arrow); }
+    .edge--accent { stroke: var(--planta-accent, #c07a3e); marker-end: url(#omni-layers-arrow-accent); }
+  </style>
+  <defs>
+    <marker id="omni-layers-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--planta-line, color-mix(in srgb, currentColor 35%, transparent))" />
+    </marker>
+    <marker id="omni-layers-arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--planta-accent, #c07a3e)" />
+    </marker>
+  </defs>
+
+  <path class="edge" d="M380 88 L380 120" />
+  <path class="edge" d="M380 188 L380 220" />
+  <path class="edge" d="M380 310 L380 340" />
+  <path class="edge edge--accent" d="M380 408 L380 440" />
+  <path class="edge edge--accent" d="M380 508 L380 540" />
+
+  <g class="node">
+    <rect x="100" y="20" width="560" height="68" />
+    <text x="380" y="60">Rotas com guard por papel</text>
+  </g>
+  <g class="node">
+    <rect x="100" y="120" width="560" height="68" />
+    <text x="380" y="160">Layout autenticado</text>
+  </g>
+  <g class="node">
+    <rect x="100" y="220" width="560" height="90" />
+    <text x="380" y="258">Telas: catálogo, retirada, aprovações</text>
+    <text class="subline" x="380" y="283">painel · administração</text>
+  </g>
+  <g class="node node--accent">
+    <rect x="100" y="340" width="560" height="68" />
+    <text x="380" y="368">Regras compartilhadas</text>
+    <text class="subline" x="380" y="391">datas · estoque · mensagens</text>
+  </g>
+  <g class="node node--accent">
+    <rect x="100" y="440" width="560" height="68" />
+    <text x="380" y="468">Cliente Supabase</text>
+    <text class="subline" x="380" y="491">sessão e perfil</text>
+  </g>
+  <g class="node">
+    <rect x="100" y="540" width="560" height="68" />
+    <text x="380" y="580">Auth · PostgreSQL · Storage</text>
+  </g>
+</svg>

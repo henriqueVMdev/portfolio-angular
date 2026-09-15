@@ -1,0 +1,7 @@
+flowchart LR
+    request["Solicitação"] -->|"acima do limite"| approval["PendenteAprovacao"]
+    request -->|"dentro do limite"| delivery["PendenteEntrega"]
+    approval -->|"aprovado"| delivery
+    approval -->|"recusado"| refused["Recusado"]
+    delivery -->|"entrega registrada"| delivered["Entregue"]
+    delivered -->|"devolução registrada"| returned["Devolvido"]

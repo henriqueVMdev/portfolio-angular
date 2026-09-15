@@ -1,0 +1,92 @@
+<div class="trajectory-timeline">
+  <div class="trajectory-constellation">
+    <svg
+      class="trajectory-constellation__lines"
+      [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      @for (end of trajectory.slice(1); track end.id; let index = $index) {
+        <line
+          pathLength="1"
+          [attr.data-drawn]="index < activeIndex() ? true : null"
+          [attr.data-future]="end.estrela === null ? true : null"
+          [attr.x1]="trajectory[index].x * chartWidth"
+          [attr.y1]="trajectory[index].y * chartHeight"
+          [attr.x2]="end.x * chartWidth"
+          [attr.y2]="end.y * chartHeight"
+        />
+      }
+    </svg>
+
+    <ul class="trajectory-constellation__stars">
+      @for (milestone of trajectory; track milestone.id; let index = $index) {
+        <li>
+          <button
+            type="button"
+            [attr.data-state]="starState(index)"
+            [attr.data-weight]="milestone.peso"
+            [attr.data-empty]="milestone.estrela === null ? true : null"
+            [attr.aria-current]="index === activeIndex() ? 'true' : null"
+            [style]="starStyle(index, milestone.x, milestone.y)"
+            (click)="go(index)"
+          >
+            <i class="trajectory-constellation__dot" aria-hidden="true"></i>
+            <span class="trajectory-constellation__label">{{ milestone.titulo }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div
+    class="trajectory-timeline__chapter"
+    [attr.data-weight]="active().peso"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <article class="trajectory-timeline__chapter-content">
+      <p class="trajectory-timeline__year">{{ active().ano }}</p>
+      <h3>{{ active().titulo }}</h3>
+      @if (active().subtitulo) {
+        <p class="trajectory-timeline__role">{{ active().subtitulo }}</p>
+      }
+      <p class="trajectory-timeline__text">{{ active().texto }}</p>
+    </article>
+  </div>
+
+  <div class="trajectory-timeline__controls">
+    <button
+      type="button"
+      [attr.aria-disabled]="!previous()"
+      [attr.aria-label]="previous() ? 'Voltar para ' + previous()!.titulo : 'Primeiro marco da trajetória'"
+      (click)="go(activeIndex() - 1)"
+    >
+      <span aria-hidden="true">←</span>
+      <span>
+        <small>ANTERIOR</small>
+        <strong>{{ previous()?.ano ?? '·' }}</strong>
+      </span>
+    </button>
+
+    <p aria-hidden="true">
+      <span>{{ (activeIndex() + 1).toString().padStart(2, '0') }}</span>
+      <i aria-hidden="true"></i>
+      <span>{{ trajectory.length.toString().padStart(2, '0') }}</span>
+    </p>
+
+    <button
+      type="button"
+      [attr.aria-disabled]="!next()"
+      [attr.aria-label]="next() ? 'Avançar para ' + next()!.titulo : 'Último marco da trajetória'"
+      (click)="go(activeIndex() + 1)"
+    >
+      <span>
+        <small>{{ next() ? 'PRÓXIMO' : 'ATUAL' }}</small>
+        <strong>{{ next()?.ano ?? active().ano }}</strong>
+      </span>
+      <span aria-hidden="true">→</span>
+    </button>
+  </div>
+</div>
