@@ -1,0 +1,52 @@
+<dialog
+  #dialog
+  id="resume-dialog"
+  class="resume-modal"
+  aria-labelledby="resume-dialog-title"
+  (click)="onBackdrop($event)"
+  (cancel)="onCancel($event)"
+>
+  <div class="resume-modal__surface">
+    <header class="resume-modal__header">
+      <div>
+        <p>DOCUMENTO / CURRÍCULO</p>
+        <h2 id="resume-dialog-title">Henrique de Paula Valim Melo</h2>
+      </div>
+
+      <a
+        class="resume-modal__download"
+        [href]="fileUrl()"
+        download="curriculo-henrique-valim.pdf"
+      >
+        <span>Baixar PDF</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+
+      <button
+        #closeButton
+        class="resume-modal__close"
+        type="button"
+        (click)="closed.emit()"
+      >
+        <span>Fechar</span>
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <div class="resume-modal__viewer">
+      <div class="resume-modal__pages" #pages></div>
+
+      @if (status() === 'loading') {
+        <p class="resume-modal__state" role="status">Carregando documento…</p>
+      }
+
+      @if (status() === 'error') {
+        <p class="resume-modal__state">
+          Não foi possível exibir o documento aqui.
+          <a [href]="fileUrl()" download="curriculo-henrique-valim.pdf">Baixe o PDF</a>
+          para consultar.
+        </p>
+      }
+    </div>
+  </div>
+</dialog>

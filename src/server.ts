@@ -5,24 +5,47 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { handleContact } from './server/contact';
+
+// ponytail: parser mínimo de .env, sem interpolação. Trocar por dotenv se o arquivo crescer.
+function loadDotEnv() {
+  const file = join(process.cwd(), '.env');
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq < 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    process.env[key] ??= value;
+  }
+}
+
+loadDotEnv();
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+app.post('/api/contact', express.json({ limit: '32kb' }), async (req, res) => {
+  try {
+    const result = await handleContact(req.body, req.headers['x-forwarded-for'], req.ip);
+    if (result.retryAfter) res.setHeader('Retry-After', String(result.retryAfter));
+    res.status(result.status).json(result.body);
+  } catch {
+    res.status(500).json({ error: 'Falha ao enviar a mensagem.' });
+  }
+});
 
 /**
  * Serve static files from /browser
@@ -36,7 +59,7 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Handle all other requests by rendering the Angular application
  */
 app.use((req, res, next) => {
   angularApp
@@ -49,7 +72,7 @@ app.use((req, res, next) => {
 
 /**
  * Start the server if this module is the main entry point, or it is ran via PM2.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ * The server listens on the port defined by the PORT environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
@@ -57,7 +80,6 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
     if (error) {
       throw error;
     }
-
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }

@@ -1,0 +1,727 @@
+<main class="blueprint-page">
+  <a class="blueprint-skip" href="#conteudo-da-planta">Ir para o conteúdo técnico</a>
+
+  <div class="blueprint-scroll">
+    <header class="blueprint-header">
+      <app-blueprint-link
+        href="/#projetos"
+        class="blueprint-back"
+        label="Fechar planta e voltar aos projetos"
+      >
+        <span class="blueprint-back__arrow" aria-hidden="true">←</span>
+        <span>Fechar planta</span>
+      </app-blueprint-link>
+
+      <p class="blueprint-coordinate">
+        <span>PLANTA {{ project().index }}</span>
+        <span aria-hidden="true"> / </span>
+        <span>{{ isMyrias() ? 'MYRIAS' : project().slug.toUpperCase() }}</span>
+      </p>
+
+      <span class="blueprint-header__seal" aria-hidden="true">{{ project().index }}</span>
+    </header>
+
+    <section
+      id="visao"
+      class="blueprint-hero blueprint-hero--obverse"
+      aria-labelledby="project-title"
+      aria-describedby="project-description project-notice"
+    >
+      <div class="blueprint-hero__registration" aria-hidden="true">
+        <span>OBV / {{ project().index }}</span>
+        <span>ARQUIVO DE SISTEMA</span>
+        <span>GR {{ (currentIndex() + 1).toString().padStart(2, '0') }}</span>
+      </div>
+
+      <div class="blueprint-hero__content">
+        <div class="blueprint-hero__copy">
+          <p class="chapter-mark">{{ project().category }}</p>
+          <span class="project-index project-index--large" aria-hidden="true">{{ project().index }}</span>
+          <h1 id="project-title">{{ project().name }}</h1>
+          <p id="project-description" class="blueprint-lead">
+            {{ project().coverDescription ?? project().description }}
+          </p>
+          <p id="project-notice" class="placeholder-notice">{{ project().placeholderNotice }}</p>
+
+          <ul class="stack-line stack-line--large" aria-label="Tecnologias do projeto">
+            @for (item of project().stack; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="blueprint-hero__preview">
+          <app-interface-preview [project]="project()" />
+          <p class="blueprint-hero__preview-note">
+            <span>REVERSO</span>
+            Trabalhando nas previews
+          </p>
+        </div>
+      </div>
+
+      <a class="blueprint-hero__continue" href="#planta-tecnica">
+        <span>Descer à placa técnica</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+    </section>
+
+    <div id="planta-tecnica" class="blueprint-sheet blueprint-sheet--technical">
+      <nav class="blueprint-index" aria-label="Índice da planta">
+        <p class="blueprint-index__title">Índice do artefato</p>
+        <ol>
+          @for (section of sections(); track section.href) {
+            <li>
+              <a [href]="section.href">
+                <span aria-hidden="true">{{ section.marker }}</span>
+                {{ section.label }}
+              </a>
+            </li>
+          }
+        </ol>
+        <p class="blueprint-index__folio" aria-hidden="true">
+          {{ project().index }} / {{ projectCount.toString().padStart(2, '0') }}
+        </p>
+      </nav>
+
+      <article
+        id="conteudo-da-planta"
+        class="blueprint-document"
+        aria-labelledby="technical-plate-title"
+      >
+        <header class="blueprint-document__masthead">
+          <div>
+            <p class="chapter-mark">PLACA TÉCNICA</p>
+            <h2 id="technical-plate-title">Leitura do sistema</h2>
+          </div>
+          <p>{{ project().technicalSummary ?? project().summary }}</p>
+          <dl class="blueprint-register">
+            <div>
+              <dt>Registro</dt>
+              <dd>{{ project().index }}</dd>
+            </div>
+            <div>
+              <dt>Classe</dt>
+              <dd>{{ project().category }}</dd>
+            </div>
+            <div>
+              <dt>Estado</dt>
+              <dd>{{ statusLabel() }}</dd>
+            </div>
+          </dl>
+        </header>
+
+        @if (isMyrias()) {
+          <section
+            id="visao-geral"
+            class="blueprint-section blueprint-section--overview"
+            aria-labelledby="overview-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">1</span>
+              <div>
+                <p class="chapter-mark">VISÃO GERAL</p>
+                <h2 id="overview-title">Da operação manual ao padrão interno</h2>
+                <p class="blueprint-section__intro">
+                  O contexto que originou o Myrias, a solução construída e o impacto observado na operação da HRB.
+                </p>
+              </div>
+            </header>
+
+            <div class="myrias-overview__narrative">
+              <article>
+                <p class="myrias-overview__eyebrow">01 / CONTEXTO</p>
+                <h3>O problema</h3>
+                <p>
+                  A HRB opera anúncios de autopeças no Mercado Livre em mais de uma conta. Manter esse catálogo alinhado era trabalho manual, anúncio por anúncio: replicar um item da conta principal na secundária, corrigir compatibilidades, ajustar preço e revisar título. Existia um SaaS pago para copiar anúncios, mas ele resolvia apenas a criação, não a manutenção contínua nem a operação em lote.
+                </p>
+              </article>
+
+              <article>
+                <p class="myrias-overview__eyebrow">02 / RESPOSTA</p>
+                <h3>A solução</h3>
+                <p>
+                  Um painel próprio que conversa direto com a API do Mercado Livre. Ele conecta várias contas por OAuth, lê o catálogo inteiro, aplica alterações em lote, audita cada escrita e expõe um assistente de IA que analisa a conta e propõe mudanças, sempre com confirmação humana antes de qualquer escrita.
+                </p>
+              </article>
+            </div>
+
+            <div class="myrias-overview__complement">
+              <p class="project-overview__origin">
+                <em>Myrias</em> (μυριάς) era o dez mil dos gregos a maior quantidade que o sistema numérico deles nomeava. Acima disso, contava-se em miríades de miríades. O nome ficou no inglês <em>myriad</em> como "incontável"
+              </p>
+            </div>
+          </section>
+        }
+
+        @if (isBasanos()) {
+          <section
+            id="visao-geral"
+            class="blueprint-section blueprint-section--overview"
+            aria-labelledby="basanos-overview-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">1</span>
+              <div>
+                <p class="chapter-mark">VISÃO GERAL</p>
+                <h2 id="basanos-overview-title">O problema</h2>
+              </div>
+            </header>
+
+            <div class="basanos-overview__narrative">
+              <article>
+                <p class="basanos-overview__lead">
+                  Um backtest bonito é fácil de produzir. Basta testar parâmetros suficientes sobre o mesmo histórico e alguma combinação vai parecer excelente, não porque encontrou um padrão real, mas porque encontrou um ruído que se repetiu. É o equivalente financeiro de treinar um modelo e avaliá-lo nos dados de treino.
+                </p>
+                <p>
+                  O custo desse erro não é acadêmico. Uma estratégia sobreajustada não falha aos poucos: ela funciona no papel, é colocada em operação e perde dinheiro imediatamente, porque o padrão que ela aprendeu nunca existiu fora daquela amostra.
+                </p>
+                <p class="basanos-overview__purpose">Basanos existe para tornar esse erro difícil de cometer.</p>
+                <p class="project-overview__origin">
+                  <em>Basanos</em> (βάσανος) era a pedra de toque usada na Grécia antiga para ensaiar metais. Esfregava-se a peça na pedra e o risco deixado revelava se era ouro puro ou liga barata. A pedra não opina; ela mede.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section
+            id="disciplina"
+            class="blueprint-section basanos-section--discipline"
+            aria-labelledby="basanos-discipline-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">2</span>
+              <div>
+                <p class="chapter-mark">INVARIANTES</p>
+                <h2 id="basanos-discipline-title">A disciplina</h2>
+                <p class="blueprint-section__intro">
+                  O sistema é construído em torno de quatro regras que valem para toda estratégia avaliada, sem exceção configurável.
+                </p>
+              </div>
+            </header>
+
+            <ol class="basanos-rule-grid">
+              @for (rule of project().decisions; track rule.title; let index = $index) {
+                <li>
+                  <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                  <article>
+                    <h3>{{ rule.title }}</h3>
+                    <p>{{ rule.body }}</p>
+                  </article>
+                </li>
+              }
+            </ol>
+          </section>
+
+          <section
+            id="funil"
+            class="blueprint-section basanos-section--funnel"
+            aria-labelledby="basanos-funnel-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">3</span>
+              <div>
+                <p class="chapter-mark">VALIDAÇÃO</p>
+                <h2 id="basanos-funnel-title">O funil</h2>
+                <p class="blueprint-section__intro">
+                  Uma hipótese percorre um caminho com pontos de reprovação em cada etapa. A maioria não chega ao fim. Esse é o propósito.
+                </p>
+              </div>
+            </header>
+
+            <figure class="myrias-diagram-card basanos-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">01</span>
+                <div>
+                  <h3>Portões de reprovação</h3>
+                  <p>Da hipótese inicial à aprovação para capital reduzido.</p>
+                </div>
+              </header>
+              <app-mermaid-diagram
+                [definition]="basanosFunnel"
+                label="Funil de validação de estratégias do Basanos"
+              />
+              <figcaption>
+                Cada transição preserva o veredito; reprovar cedo é uma saída esperada do sistema.
+              </figcaption>
+            </figure>
+
+            <div class="basanos-section-copy">
+              <p>
+                O ponto de maior mortalidade é a transição entre backtest e validação fora da amostra. É comum uma estratégia com curva de capital atraente perder a maior parte da vantagem quando os custos entram, e perder o restante quando é avaliada em períodos que não participaram da calibração. A etapa de permutação fecha a última porta: se o desempenho sobrevive ao reembaralhamento da ordem dos retornos, o padrão detectado não dependia da sequência, o que significa que não era um padrão.
+              </p>
+              <p>
+                Nenhuma estratégia é promovida à execução com capital sem passar por todas as etapas. O sistema não impede a decisão humana de ignorar um veredito, mas registra o veredito.
+              </p>
+            </div>
+          </section>
+        }
+
+        @if (isOmniSeg()) {
+          <section
+            id="visao-geral"
+            class="blueprint-section blueprint-section--overview"
+            aria-labelledby="omniseg-overview-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">1</span>
+              <div>
+                <p class="chapter-mark">VISÃO GERAL</p>
+                <h2 id="omniseg-overview-title">O problema</h2>
+              </div>
+            </header>
+
+            <div class="omniseg-overview__narrative">
+              <p class="omniseg-overview__lead">
+                O controle de EPIs em papel falha de um jeito específico: não falha visivelmente. As fichas continuam sendo preenchidas, o armário continua tendo itens, e o que se perde é a resposta para três perguntas: quem está com o quê, desde quando, e se aquele equipamento ainda está dentro da validade.
+              </p>
+              <p>
+                As duas primeiras custam dinheiro. A terceira custa outra coisa. Um capacete vencido em uso é indistinguível de um capacete novo até o momento em que deixa de ser. Um sistema que registra a saída mas não congela a validade no instante da entrega não sabe a diferença.
+              </p>
+              <p class="omniseg-overview__thesis">
+                O OmniSeg parte daí. O objeto central não é o EPI, é a custódia: o vínculo entre uma pessoa e um item durante um intervalo de tempo.
+              </p>
+            </div>
+          </section>
+
+          <section
+            id="regras"
+            class="blueprint-section omniseg-section--rules"
+            aria-labelledby="omniseg-rules-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">2</span>
+              <div>
+                <p class="chapter-mark">INVARIANTES</p>
+                <h2 id="omniseg-rules-title">As regras</h2>
+                <p class="blueprint-section__intro">Três decisões que valem para todo o sistema.</p>
+              </div>
+            </header>
+
+            <ol class="omniseg-rule-grid">
+              @for (rule of project().decisions; track rule.title; let index = $index) {
+                <li>
+                  <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                  <article>
+                    <h3>{{ rule.title }}</h3>
+                    <p>{{ rule.body }}</p>
+                  </article>
+                </li>
+              }
+            </ol>
+          </section>
+
+          <section
+            id="ciclo"
+            class="blueprint-section omniseg-section--cycle"
+            aria-labelledby="omniseg-cycle-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">3</span>
+              <div>
+                <p class="chapter-mark">CUSTÓDIA</p>
+                <h2 id="omniseg-cycle-title">O ciclo</h2>
+                <p class="blueprint-section__intro">
+                  Um pedido nasce em um de dois estados, decidido pela comparação entre a quantidade pedida e o saldo disponível do solicitante, calculado pelo limite menos o que já está em uso. Dentro do teto, entra direto na fila de entrega. Acima, entra na fila de aprovação.
+                </p>
+              </div>
+            </header>
+
+            <figure class="myrias-diagram-card omniseg-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">01</span>
+                <div>
+                  <h3>Estados da custódia</h3>
+                </div>
+              </header>
+              <app-omniseg-svg-diagram
+                diagram="cycle"
+                label="Diagrama rolável: ciclo de custódia em cinco estados do OmniSeg"
+              />
+              <figcaption>Cada transição grava quem decidiu e quando. O estoque só se move nas duas últimas.</figcaption>
+            </figure>
+
+            <div class="omniseg-cycle__notes">
+              <p>
+                O estoque não é debitado na solicitação, apenas na entrega. Isso mantém o pedido barato e reversível, e cria uma janela: entre solicitar e receber, o saldo pode ter mudado. A entrega confere o saldo lido antes de debitar e recusa a operação se ele mudou, o que reduz a janela sem fechá-la, como a seção 05 registra.
+              </p>
+            </div>
+          </section>
+        }
+
+        <section
+          id="arquitetura"
+          class="blueprint-section blueprint-section--architecture"
+          aria-labelledby="architecture-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">{{ architectureSerial() }}</span>
+            <div>
+              <p class="chapter-mark">SISTEMA</p>
+              <h2 id="architecture-title">Arquitetura</h2>
+              <p class="blueprint-section__intro">
+                @if (isBasanos()) {
+                  Aplicação web de página única em Vue 3 consumindo uma API Flask, com os motores quantitativos em Python sobre Pandas, NumPy, SciPy e statsmodels. Estratégias são plugins descobertos dinamicamente, cada um declarando seu próprio schema de parâmetros. Adicionar uma estratégia não exige tocar no núcleo.
+                } @else if (isOmniSeg()) {
+                  Aplicação Vue 3 com roteamento por vue-router, servida como estático e consumindo Supabase diretamente para autenticação, dados e arquivos. Não existe camada de serviços: as telas falam com o SDK, e as regras recorrentes, como datas civis, ajuste de estoque e mensagens, vivem em composables.
+                } @else {
+                  Uma leitura do fluxo principal, seguida pelas responsabilidades que definem o sistema.
+                }
+              </p>
+            </div>
+          </header>
+
+          @if (isMyrias()) {
+            <div class="myrias-diagram-stack">
+              <figure class="myrias-diagram-card">
+                <header class="myrias-diagram-card__header">
+                  <span aria-hidden="true">01</span>
+                  <div>
+                    <h3>Mapa de pacotes por domínio</h3>
+                    <p>Dependências internas e pontos de concentração do sistema.</p>
+                  </div>
+                </header>
+                <app-mermaid-diagram
+                  [definition]="myriasPackageMap"
+                  label="Mapa de dependências entre os pacotes por domínio do Myrias"
+                />
+                <figcaption>
+                  Os fluxos convergem no cliente do Mercado Livre; operações sensíveis também registram auditoria em ops.
+                </figcaption>
+              </figure>
+
+              <figure class="myrias-diagram-card">
+                <header class="myrias-diagram-card__header">
+                  <span aria-hidden="true">02</span>
+                  <div>
+                    <h3>Camadas e integrações</h3>
+                    <p>Da sessão do painel às dependências externas e à persistência.</p>
+                  </div>
+                </header>
+                <app-mermaid-diagram
+                  [definition]="myriasLayerFlow"
+                  label="Fluxo entre frontend, autenticação, serviços, persistência e integrações externas do Myrias"
+                />
+                <figcaption>
+                  O filtro autentica o operador antes do controller; MeliClient e OpenRouterClient isolam as APIs externas.
+                </figcaption>
+              </figure>
+            </div>
+          } @else if (isBasanos()) {
+            <figure class="myrias-diagram-card basanos-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">02</span>
+                <div>
+                  <h3>Camadas e responsabilidades</h3>
+                  <p>Pesquisa, automação e persistência sobre os mesmos contratos.</p>
+                </div>
+              </header>
+              <app-mermaid-diagram
+                [definition]="basanosArchitecture"
+                label="Arquitetura da aplicação Basanos"
+              />
+              <figcaption>
+                A camada de dados e os plugins são compartilhados pelos motores quantitativos e pela execução.
+              </figcaption>
+            </figure>
+
+            <div class="basanos-section-copy basanos-section-copy--architecture">
+              <p>
+                Duas decisões estruturais merecem nota. A <strong>camada de normalização de dados</strong> converte toda fonte externa para um formato único com índice temporal. O motor quantitativo não sabe de onde veio o dado, o que permite trocar de fonte sem tocar em estratégia. E o <strong>runner de automação</strong> trabalha exclusivamente sobre candles fechados, reconciliando ordens e posições contra o estado persistido antes de calcular qualquer sinal novo, para que uma reinicialização no meio de uma operação não produza estado divergente.
+              </p>
+              <p>
+                O estado operacional vive em SQLite com journaling WAL, índices por instância e escrita transacional. Dados de mercado e custos de financiamento são cacheados em Parquet e em memória, com reuso de cache expirado como degradação controlada quando uma fonte externa fica indisponível.
+              </p>
+            </div>
+          } @else if (isOmniSeg()) {
+            <figure class="myrias-diagram-card omniseg-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">01</span>
+                <div>
+                  <h3>Contexto e fronteira</h3>
+                </div>
+              </header>
+              <app-omniseg-svg-diagram
+                diagram="context"
+                label="Diagrama rolável: contexto e fronteira de segurança da aplicação OmniSeg"
+              />
+              <figcaption>
+                Não há caixa entre o navegador e o banco. O que contém o usuário está inteiramente do outro lado da linha.
+              </figcaption>
+            </figure>
+
+            <figure class="myrias-diagram-card omniseg-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">02</span>
+                <div>
+                  <h3>Camadas do cliente</h3>
+                </div>
+              </header>
+              <app-omniseg-svg-diagram
+                diagram="layers"
+                label="Diagrama rolável: camadas do cliente da aplicação OmniSeg"
+              />
+              <figcaption>
+                As telas consomem o SDK diretamente. Funciona neste tamanho e dificulta teste unitário. Essa é a dívida citada em Limites.
+              </figcaption>
+            </figure>
+
+            <div class="omniseg-architecture__copy">
+              <p>
+                Duas escolhas merecem nota. <strong>Datas civis nunca passam por conversão UTC</strong>, pois em fuso negativo isso desloca o dia e um EPI passa a vencer vinte e quatro horas antes do que deveria. E o <strong>ajuste de estoque usa concorrência otimista</strong>: a escrita só ocorre se o saldo ainda for igual ao lido, distinguindo saldo insuficiente de conflito. Reduz atualização perdida sem substituir uma transação.
+              </p>
+              <p>A landing pública não carrega o SDK do Supabase, que fica em um chunk separado de 48 kB comprimido.</p>
+            </div>
+          }
+
+          <ul class="capability-list" aria-label="Capacidades do sistema">
+            @for (capability of project().capabilities; track capability) {
+              <li>{{ capability }}</li>
+            }
+          </ul>
+        </section>
+
+        @if (isOmniSeg()) {
+          <section
+            id="limites"
+            class="blueprint-section omniseg-section--limits"
+            aria-labelledby="omniseg-limits-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">5</span>
+              <div>
+                <p class="chapter-mark">FRONTEIRAS</p>
+                <h2 id="omniseg-limits-title">Limites conhecidos</h2>
+                <p class="blueprint-section__intro">
+                  Levantados por auditoria do próprio código, com severidade atribuída. Estão aqui porque são reais.
+                </p>
+              </div>
+            </header>
+
+            <ol class="omniseg-limit-list">
+              @for (limit of omnisegLimits; track limit.title; let index = $index) {
+                <li>
+                  <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                  <article>
+                    <h3>{{ limit.title }}</h3>
+                    <p>{{ limit.body }}</p>
+                  </article>
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
+        @if (isBasanos()) {
+          <section
+            id="limites"
+            class="blueprint-section basanos-section--limits"
+            aria-labelledby="basanos-limits-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">5</span>
+              <div>
+                <p class="chapter-mark">FRONTEIRAS</p>
+                <h2 id="basanos-limits-title">Limites conhecidos</h2>
+                <p class="blueprint-section__intro">
+                  Documentados no projeto porque são reais, não porque são pequenos.
+                </p>
+              </div>
+            </header>
+
+            <ol class="basanos-limit-list">
+              @for (limit of basanosLimits; track limit.title; let index = $index) {
+                <li>
+                  <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                  <article>
+                    <h3>{{ limit.title }}</h3>
+                    <p>{{ limit.body }}</p>
+                  </article>
+                </li>
+              }
+            </ol>
+          </section>
+
+          <section
+            id="escopo"
+            class="blueprint-section basanos-section--scope"
+            aria-labelledby="basanos-scope-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">6</span>
+              <div>
+                <p class="chapter-mark">PERÍMETRO</p>
+                <h2 id="basanos-scope-title">Escopo adicional</h2>
+              </div>
+            </header>
+
+            <div class="basanos-scope-card">
+              <p>
+                Além do núcleo de validação, o sistema inclui monitoramento de mercado, detecção de regimes, análise de carteira, um sistema de gestão de ordens simulado e um diário de operações com métricas. Esses módulos compartilham a mesma camada de dados e não são o foco desta página.
+              </p>
+            </div>
+          </section>
+        }
+
+        @if (!isBasanos() && !isOmniSeg()) {
+          <section
+            id="documentacao"
+            class="blueprint-section blueprint-section--contract"
+            aria-labelledby="documentation-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">{{ isMyrias() ? '3' : 'B' }}</span>
+              <div>
+                <p class="chapter-mark">CONTRATO</p>
+                <h2 id="documentation-title">Documentação da API</h2>
+                <p class="blueprint-section__intro">
+                  Rotas demonstrativas que tornam responsabilidades e limites do projeto legíveis.
+                </p>
+              </div>
+            </header>
+
+            @if (isMyrias()) {
+              <figure class="myrias-diagram-card myrias-diagram-card--contract">
+                <header class="myrias-diagram-card__header">
+                  <span aria-hidden="true">03</span>
+                  <div>
+                    <h3>Handshake OAuth 2.0 com PKCE</h3>
+                    <p>Ordem das trocas entre operador, backend, banco e Mercado Livre.</p>
+                  </div>
+                </header>
+                <app-mermaid-diagram
+                  [definition]="myriasOauthFlow"
+                  label="Sequência do handshake OAuth 2.0 com PKCE do Myrias"
+                  variant="sequence"
+                />
+                <figcaption>
+                  O verifier persiste no banco para sobreviver a reinícios e o state é consumido uma única vez.
+                </figcaption>
+              </figure>
+            }
+
+            <div
+              class="endpoint-table__viewport"
+              role="region"
+              aria-label="Endpoints ilustrativos do projeto"
+              tabindex="0"
+            >
+              <table class="endpoint-table">
+                <caption>Contrato ilustrativo: substituir pelos endpoints reais</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Método</th>
+                    <th scope="col">Rota</th>
+                    <th scope="col">Responsabilidade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (endpoint of project().endpoints; track endpoint.method + endpoint.path) {
+                    <tr>
+                      <td>
+                        <strong class="endpoint-table__method" [attr.data-method]="endpoint.method.toLowerCase()">
+                          {{ endpoint.method }}
+                        </strong>
+                      </td>
+                      <td>
+                        <code>{{ endpoint.path }}</code>
+                      </td>
+                      <td>{{ endpoint.purpose }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section
+            id="decisoes"
+            class="blueprint-section blueprint-section--decisions"
+            aria-labelledby="decisions-title"
+          >
+            <header class="blueprint-section__header">
+              <span class="blueprint-section__serial" aria-hidden="true">{{ isMyrias() ? '4' : 'C' }}</span>
+              <div>
+                <p class="chapter-mark">RACIONAL</p>
+                <h2 id="decisions-title">Decisões de engenharia</h2>
+                <p class="blueprint-section__intro">
+                  O raciocínio por trás da implementação, registrado como parte do artefato.
+                </p>
+              </div>
+            </header>
+
+            <ol class="decision-ledger">
+              @for (decision of project().decisions; track decision.title; let index = $index) {
+                <li>
+                  <span class="decision-ledger__index" aria-hidden="true">
+                    {{ (index + 1).toString().padStart(2, '0') }}
+                  </span>
+                  <article>
+                    <h3>{{ decision.title }}</h3>
+                    <p>{{ decision.body }}</p>
+                    @if (decision.cost || decision.gain) {
+                      <dl class="decision-ledger__tradeoffs">
+                        @if (decision.cost) {
+                          <div>
+                            <dt>Custo</dt>
+                            <dd>{{ decision.cost }}</dd>
+                          </div>
+                        }
+                        @if (decision.gain) {
+                          <div data-outcome="gain">
+                            <dt>Ganho</dt>
+                            <dd>{{ decision.gain }}</dd>
+                          </div>
+                        }
+                      </dl>
+                    }
+                  </article>
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
+        @if (nextProject(); as next) {
+          <footer class="blueprint-next" aria-labelledby="next-project-title">
+            <div class="blueprint-next__register">
+              <p class="chapter-mark">PRÓXIMA CUNHAGEM</p>
+              <span aria-hidden="true">{{ next.index }} / {{ projectCount.toString().padStart(2, '0') }}</span>
+            </div>
+            <div class="blueprint-next__copy">
+              <h2 id="next-project-title">{{ next.name }}</h2>
+              <p>
+                @if (wrapsToFirst()) {
+                  Gestão de dezenas de milhares de anúncios com edição em massa, auditoria e assistente de IA sob confirmação humana.
+                } @else {
+                  {{ next.summary }}
+                }
+              </p>
+            </div>
+            <app-blueprint-link
+              [href]="'/projetos/' + next.slug"
+              class="blueprint-next__link"
+              [label]="
+                wrapsToFirst()
+                  ? 'Voltar à primeira planta: Myrias'
+                  : 'Abrir a planta do projeto ' + next.name
+              "
+            >
+              <span>{{ wrapsToFirst() ? 'Voltar à primeira planta' : 'Examinar próxima planta' }}</span>
+              <span aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
+                  <path
+                    d="M4 12 12 4M5 4h7v7"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="square"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </span>
+            </app-blueprint-link>
+          </footer>
+        }
+      </article>
+    </div>
+  </div>
+</main>

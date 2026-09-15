@@ -1,9 +1,9 @@
-<main class="portfolio-shell">
+<main class="portfolio-shell" #shell>
   <header
     #nav
     class="mint-nav"
     [class.mint-nav--open]="menuOpen()"
-    [attr.data-on-surface]="'dark'"
+    [attr.data-on-surface]="headerSurface()"
   >
     <a class="mint-nav__mark" href="#inicio" aria-label="Voltar ao início">
       <span aria-hidden="true">ΤΔ</span>
@@ -15,7 +15,12 @@
 
     <nav class="mint-nav__desktop" aria-label="Navegação principal">
       @for (item of navigation.slice(1); track item.href) {
-        <a [href]="item.href">{{ item.label }}</a>
+        <a
+          [href]="item.href"
+          [attr.aria-current]="activeSection() === item.href.slice(1) ? 'location' : null"
+        >
+          {{ item.label }}
+        </a>
       }
     </nav>
 
@@ -129,4 +134,198 @@
       </p>
     </section>
   </div>
+
+  <app-project-showcase />
+
+  <section
+    id="metodo"
+    class="method-stage"
+    aria-labelledby="method-title"
+    data-header-surface="limestone"
+  >
+    <header class="method-stage__header">
+      <p class="section-coordinate">MÉTODO / 03 PRINCÍPIOS</p>
+      <h2 id="method-title">Engenharia que deixa rastros.</h2>
+    </header>
+
+    <div class="method-stage__body">
+      <div class="method-orbit" aria-hidden="true">
+        <div class="method-orbit__ring method-orbit__ring--outer">
+          <span>ARQUITETURA · CONTEXTO · SISTEMA · EVIDÊNCIA</span>
+        </div>
+        <div class="method-orbit__ring method-orbit__ring--inner"></div>
+        <strong>ΤΕΧΝΗ</strong>
+        <small>TECHNE / FAZER COM MÉTODO</small>
+      </div>
+
+      <ol class="method-ledger">
+        @for (principle of methodPrinciples; track principle.title; let index = $index) {
+          <li class="method-ledger__item">
+            <span>{{ (index + 1).toString().padStart(2, '0') }}</span>
+            <i aria-hidden="true">{{ principle.marker }}</i>
+            <div>
+              <h3>{{ principle.title }}</h3>
+              <p>{{ principle.text }}</p>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section
+    id="trajetoria"
+    class="trajectory-stage"
+    aria-labelledby="trajectory-title"
+    data-header-surface="dark"
+  >
+    <div class="trajectory-stage__media" aria-hidden="true">
+      <video src="/media/atlas.mp4" autoplay muted playsinline preload="metadata" tabindex="-1"></video>
+    </div>
+
+    <header class="trajectory-stage__header">
+      <p class="section-coordinate">TRAJETÓRIA</p>
+      <h2 id="trajectory-title">Da fundação à arquitetura.</h2>
+    </header>
+
+    <p class="trajectory-stage__maxim">
+      <span>O céu não pesa sobre quem olha para ele.</span>
+      <span>Pesa sobre o que está embaixo.</span>
+    </p>
+
+    <app-trajectory-timeline />
+  </section>
+
+  <section
+    id="contato"
+    class="contact-stage"
+    aria-labelledby="contact-title"
+    data-header-surface="dark"
+  >
+    <p class="section-coordinate">CONTATO / DISPONÍVEL PARA CONVERSA</p>
+    <h2 id="contact-title" class="contact-stage__word">
+      Ainda há metal
+      <span>na forja.</span>
+    </h2>
+
+    <div class="contact-stage__manifesto">
+      <p>
+        <em>O que está aqui foi cunhado. O próximo ainda não tem forma.</em>
+      </p>
+      <p>
+        <strong>Me diga qual é o problema e eu digo como atacaria.</strong>
+      </p>
+    </div>
+
+    <div class="contact-stage__primary">
+      <div class="contact-stage__direct">
+        <p>
+          Se algum destes sistemas levantou uma pergunta
+          <br />
+          ela é um bom começo.
+        </p>
+        <a class="contact-stage__email" [href]="primaryContact.href">
+          <span class="contact-stage__email-label">E-mail:</span>
+          <span class="contact-stage__email-value">henrique.de.paula.valim@gmail.com</span>
+        </a>
+      </div>
+      <form class="contact-form" (submit)="onContactSubmit($event)" aria-label="Enviar mensagem por email">
+        <label class="contact-form__field">
+          <span>Seu email</span>
+          <input
+            type="email"
+            name="from"
+            autocomplete="email"
+            required
+            [disabled]="contactDisabled"
+            placeholder="voce@empresa.com"
+            (input)="onContactInput()"
+          />
+        </label>
+        <label class="contact-form__field">
+          <span>Mensagem</span>
+          <textarea
+            name="message"
+            required
+            rows="3"
+            [disabled]="contactDisabled"
+            placeholder="Qual problema você quer atacar?"
+            (input)="onContactInput()"
+          ></textarea>
+        </label>
+        <button class="contact-form__submit" type="submit" [disabled]="contactDisabled">
+          <span>
+            {{
+              contactBusy
+                ? 'Enviando…'
+                : contactStatus() === 'sent'
+                  ? 'Mensagem enviada'
+                  : 'Enviar mensagem'
+            }}
+          </span>
+          <i aria-hidden="true">{{ contactStatus() === 'sent' ? '✓' : '↗' }}</i>
+        </button>
+        @if (primaryContactIsPlaceholder) {
+          <p class="contact-form__notice">
+            Email ilustrativo. Configure o endereço real em data/portfolio.ts
+          </p>
+        }
+        @if (contactStatus() === 'sent') {
+          <p class="contact-form__status contact-form__status--ok" role="status">
+            Mensagem enviada. Respondo pelo email que você informou.
+          </p>
+        }
+        @if (contactStatus() === 'error') {
+          <p class="contact-form__status contact-form__status--error" role="alert">
+            {{ contactError() }}
+          </p>
+        }
+      </form>
+    </div>
+
+    <ul class="contact-stage__links">
+      @for (contact of profile.contacts.slice(1); track contact.label) {
+        <li>
+          @if (contact.label === 'Currículo') {
+            <button
+              class="contact-link contact-link--button"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="resume-dialog"
+              (click)="resumeOpen.set(true)"
+            >
+              <small>{{ contact.label }}</small>
+              <strong>{{ contact.value }}</strong>
+              <i aria-hidden="true">↗</i>
+            </button>
+          } @else if (isPlaceholder(contact)) {
+            <span class="contact-link contact-link--disabled" aria-disabled="true">
+              <small>{{ contact.label }}</small>
+              <strong>{{ contact.value }}</strong>
+              <i>exemplo</i>
+            </span>
+          } @else {
+            <a class="contact-link" [href]="contact.href">
+              <small>{{ contact.label }}</small>
+              <strong>{{ contact.value }}</strong>
+              <i aria-hidden="true">↗</i>
+            </a>
+          }
+        </li>
+      }
+    </ul>
+
+    <footer class="site-footer">
+      <span>ΤΔ / HENRIQUE DE PAULA VALIM MELO · 2026</span>
+      <a href="#inicio">VOLTAR AO CUNHO ↑</a>
+    </footer>
+
+    @if (resumeContact) {
+      <app-resume-modal
+        [fileUrl]="resumeContact.href"
+        [open]="resumeOpen()"
+        (closed)="resumeOpen.set(false)"
+      />
+    }
+  </section>
 </main>

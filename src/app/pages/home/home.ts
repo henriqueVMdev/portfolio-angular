@@ -1,14 +1,20 @@
+import { DOCUMENT } from '@angular/common';
 import {
   Component,
   DestroyRef,
+  NgZone,
   afterNextRender,
   inject,
   signal,
   viewChild,
 } from '@angular/core';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { profile } from '../../data/portfolio';
 import { HeroParticles } from '../../components/hero-particles';
+import { ProjectShowcase } from '../../components/project-showcase';
+import { ResumeModal } from '../../components/resume-modal';
+import { TrajectoryTimeline } from '../../components/trajectory-timeline';
 
 const navigation = [
   { href: '#inicio', label: 'Início' },
@@ -16,6 +22,24 @@ const navigation = [
   { href: '#metodo', label: 'Método' },
   { href: '#trajetoria', label: 'Trajetória' },
   { href: '#contato', label: 'Contato' },
+];
+
+const methodPrinciples = [
+  {
+    marker: 'Δ',
+    title: 'Modelar pelo gargalo',
+    text: 'A arquitetura serve à restrição real, não à simetria do diagrama. Em Myrias o limite é a cota do marketplace, e o acesso externo passa por um único cliente. Em Basanos o limite é a honestidade temporal do dado, não a velocidade do cálculo.',
+  },
+  {
+    marker: 'Σ',
+    title: 'Restringir na fonte',
+    text: 'Invariante que depende de disciplina do chamador não é invariante. Autorização vive no banco, sob RLS por papel; candles em formação são descartados antes de qualquer cálculo.',
+  },
+  {
+    marker: 'Ω',
+    title: 'Declarar o limite',
+    text: 'O que o sistema não faz é documentado com a mesma clareza do que ele faz. Um projeto que esconde onde quebra não pode ser avaliado nem é confiável em produção.',
+  },
 ];
 
 const heroParticlesConfig = {
@@ -29,36 +53,66 @@ const heroParticlesConfig = {
   },
 };
 
+type HeaderSurface = 'dark' | 'limestone' | 'saffron';
+
+const isPlaceholderContact = (contact: { href: string; value: string }) =>
+  contact.href === '#' ||
+  contact.href === 'https://github.com' ||
+  contact.href === 'https://linkedin.com' ||
+  contact.value.includes('exemplo.dev');
+
 @Component({
   selector: 'app-home',
-  imports: [HeroParticles],
+  imports: [HeroParticles, ProjectShowcase, ResumeModal, TrajectoryTimeline],
   templateUrl: './home.html',
 })
 export class Home {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly zone = inject(NgZone);
   readonly navRef = viewChild<HTMLElement>('nav');
   readonly menuButton = viewChild<HTMLButtonElement>('menuButton');
+  readonly mobileMenu = viewChild<HTMLElement>('mobileMenu');
+  readonly shell = viewChild<HTMLElement>('shell');
 
   readonly profile = profile;
   readonly navigation = navigation;
+  readonly methodPrinciples = methodPrinciples;
   readonly heroParticles = heroParticlesConfig;
   readonly menuOpen = signal(false);
+  readonly resumeOpen = signal(false);
+  readonly activeSection = signal('inicio');
+  readonly headerSurface = signal<HeaderSurface>('dark');
+  readonly contactStatus = signal<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  readonly contactError = signal('');
 
   readonly nameParts = profile.name.trim().split(/\s+/);
   readonly firstName = this.nameParts[0] || 'SEU';
   readonly remainingName = this.nameParts.slice(1).join(' ') || 'NOME';
+  readonly primaryContact = profile.contacts[0];
+  readonly primaryContactIsPlaceholder = isPlaceholderContact(this.primaryContact);
+  readonly resumeContact = profile.contacts.find((contact) => contact.label === 'Currículo');
 
   readonly heroStage = viewChild<HTMLElement>('heroStage');
   readonly heroVideo = viewChild<HTMLVideoElement>('heroVideo');
   readonly heroReady = signal(false);
   readonly heroSource = signal<string | undefined>(undefined);
 
+  get contactBusy() {
+    return this.contactStatus() === 'sending';
+  }
+
+  get contactDisabled() {
+    return this.primaryContactIsPlaceholder || this.contactBusy;
+  }
+
   constructor() {
     afterNextRender(() => {
       this.setupHeroVideo();
-      this.setupHeroMotion();
-      this.setupNavShift();
-      this.setupMenuEscape();
+      this.setupMotion();
+      this.setupNav();
+      this.setupMenuKeys();
+      this.setupSectionObserver();
     });
   }
 
@@ -68,14 +122,70 @@ export class Home {
   }
 
   toggleMenu() {
-    const next = !this.menuOpen();
-    this.menuOpen.set(next);
-    document.body.classList.toggle('menu-is-open', next);
+    this.menuOpen() ? this.closeMenu() : this.openMenu();
+  }
+
+  openMenu() {
+    this.menuOpen.set(true);
+    this.document.body.classList.add('menu-is-open');
+    const panel = this.mobileMenu();
+    const focusable = this.menuFocusable(panel);
+    requestAnimationFrame(() => focusable[0]?.focus());
   }
 
   closeMenu() {
     this.menuOpen.set(false);
-    document.body.classList.remove('menu-is-open');
+    this.document.body.classList.remove('menu-is-open');
+  }
+
+  isPlaceholder(contact: { href: string; value: string }) {
+    return isPlaceholderContact(contact);
+  }
+
+  async onContactSubmit(event: Event) {
+    event.preventDefault();
+    if (this.contactDisabled) return;
+
+    const form = event.target as HTMLFormElement;
+    const data = new FormData(form);
+    const from = String(data.get('from') || '').trim();
+    const message = String(data.get('message') || '').trim();
+    if (!from || !message) return;
+
+    this.contactStatus.set('sending');
+    this.contactError.set('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from, message }),
+      });
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+      if (!response.ok) {
+        this.contactStatus.set('error');
+        this.contactError.set(payload?.error || 'Não foi possível enviar a mensagem agora.');
+        return;
+      }
+      this.contactStatus.set('sent');
+      form.reset();
+    } catch {
+      this.contactStatus.set('error');
+      this.contactError.set('Falha de rede ao enviar a mensagem.');
+    }
+  }
+
+  onContactInput() {
+    if (this.contactStatus() !== 'idle') this.contactStatus.set('idle');
+  }
+
+  private menuFocusable(panel?: HTMLElement | null) {
+    if (!panel) return [];
+    return Array.from(
+      panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
   }
 
   private setupHeroVideo() {
@@ -139,9 +249,12 @@ export class Home {
       video.addEventListener('loadedmetadata', onMeta);
       video.addEventListener('timeupdate', onTime);
       video.addEventListener('ended', stop);
-      void video.play().then(() => this.heroReady.set(true)).catch(() => {
-        stage.dataset['heroMotion'] = 'blocked';
-      });
+      void video
+        .play()
+        .then(() => this.heroReady.set(true))
+        .catch(() => {
+          stage.dataset['heroMotion'] = 'blocked';
+        });
 
       this.destroyRef.onDestroy(() => {
         video.removeEventListener('loadedmetadata', onMeta);
@@ -152,38 +265,168 @@ export class Home {
     });
   }
 
-  private setupHeroMotion() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  private setupMotion() {
+    gsap.registerPlugin(ScrollTrigger);
+    const root = this.shell();
+    if (!root) return;
 
-    const context = gsap.context(() => {
-      gsap.fromTo(
-        '[data-hero-reveal]',
-        { y: 34, opacity: 0, clipPath: 'inset(0 0 100% 0)' },
-        {
-          y: 0,
-          opacity: 1,
-          clipPath: 'inset(0 0 0% 0)',
-          duration: 1.25,
-          stagger: 0.14,
-          ease: 'power3.out',
-          clearProps: 'clipPath',
-        },
-      );
+    const media = gsap.matchMedia();
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      const context = gsap.context(() => {
+        gsap.fromTo(
+          '[data-hero-reveal]',
+          { y: 34, opacity: 0, clipPath: 'inset(0 0 100% 0)' },
+          {
+            y: 0,
+            opacity: 1,
+            clipPath: 'inset(0 0 0% 0)',
+            duration: 1.25,
+            stagger: 0.14,
+            ease: 'power3.out',
+            clearProps: 'clipPath',
+          },
+        );
+
+        gsap.utils.toArray<HTMLElement>('[data-project-stratum]').forEach((stratum) => {
+          const projectMedia = stratum.querySelector<HTMLElement>('[data-project-media]');
+          const projectNumber = stratum.querySelector<HTMLElement>('[data-project-number]');
+
+          if (projectMedia) {
+            gsap.fromTo(
+              projectMedia,
+              { clipPath: 'inset(0 100% 0 0)' },
+              {
+                clipPath: 'inset(0 0% 0 0)',
+                duration: 1.2,
+                ease: 'power3.out',
+                clearProps: 'clipPath',
+                scrollTrigger: {
+                  trigger: stratum,
+                  start: 'top 72%',
+                  once: true,
+                },
+              },
+            );
+          }
+
+          if (projectNumber) {
+            gsap.fromTo(
+              projectNumber,
+              { yPercent: 38, opacity: 0 },
+              {
+                yPercent: 0,
+                opacity: 1,
+                duration: 1.1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: stratum,
+                  start: 'top 76%',
+                  once: true,
+                },
+              },
+            );
+          }
+        });
+
+        gsap.fromTo(
+          '.method-ledger__item',
+          { x: 44, opacity: 0 },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 1.05,
+            stagger: 0.16,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: '.method-stage',
+              start: 'top 68%',
+              once: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          '.contact-stage__word',
+          { clipPath: 'inset(0 100% 0 0)' },
+          {
+            clipPath: 'inset(0 0% 0 0)',
+            duration: 1.35,
+            ease: 'power3.out',
+            clearProps: 'clipPath',
+            scrollTrigger: {
+              trigger: '.contact-stage',
+              start: 'top 70%',
+              once: true,
+            },
+          },
+        );
+      }, root);
+
+      return () => context.revert();
     });
 
-    this.destroyRef.onDestroy(() => context.revert());
+    media.add('(prefers-reduced-motion: no-preference) and (pointer: fine)', () => {
+      const orbit = root.querySelector<HTMLElement>('.method-orbit');
+      const outer = orbit?.querySelector('.method-orbit__ring--outer');
+      const inner = orbit?.querySelector('.method-orbit__ring--inner');
+      if (!orbit || !outer || !inner) return;
+
+      const rotateOuter = gsap.quickTo(outer, 'rotation', {
+        duration: 0.9,
+        ease: 'power3.out',
+      });
+      const rotateInner = gsap.quickTo(inner, 'rotation', {
+        duration: 1.35,
+        ease: 'power3.out',
+      });
+
+      // ponytail: atan2 salta de +180 para -180, então acumulamos o delta
+      // para o anel girar sempre pelo caminho curto em vez de dar a volta.
+      let lastAngle = 0;
+      let turned = 0;
+
+      const followPointer = (event: PointerEvent) => {
+        const rect = orbit.getBoundingClientRect();
+        const angle =
+          (Math.atan2(
+            event.clientY - (rect.top + rect.height / 2),
+            event.clientX - (rect.left + rect.width / 2),
+          ) *
+            180) /
+          Math.PI;
+
+        let delta = angle - lastAngle;
+        if (delta > 180) delta -= 360;
+        else if (delta < -180) delta += 360;
+
+        lastAngle = angle;
+        turned += delta;
+        rotateOuter(turned);
+        rotateInner(turned * -0.55);
+      };
+
+      this.zone.runOutsideAngular(() => {
+        window.addEventListener('pointermove', followPointer, { passive: true });
+      });
+
+      return () => window.removeEventListener('pointermove', followPointer);
+    });
+
+    void document.fonts.ready.then(() => ScrollTrigger.refresh());
+    this.destroyRef.onDestroy(() => media.revert());
   }
 
-  private setupNavShift() {
+  private setupNav() {
+    const root = this.shell();
     const nav = this.navRef();
-    if (!nav) return;
+    if (!root || !nav) return;
 
+    const surfaces = Array.from(root.querySelectorAll<HTMLElement>('[data-header-surface]'));
     let frameId = 0;
     let lastY = window.scrollY;
     let shift = 0;
 
-    const update = () => {
-      frameId = 0;
+    const updateHeaderVisibility = () => {
       const y = window.scrollY;
       const height = nav.offsetHeight;
       const delta = y - lastY;
@@ -195,24 +438,95 @@ export class Home {
       nav.style.setProperty('--nav-shift', `${-shift}px`);
     };
 
-    const schedule = () => {
-      if (frameId === 0) frameId = window.requestAnimationFrame(update);
+    const updateHeaderSurface = () => {
+      frameId = 0;
+      updateHeaderVisibility();
+
+      const navRect = nav.getBoundingClientRect();
+      const sampleX = Math.max(0, Math.min(window.innerWidth - 1, window.innerWidth / 2));
+      const sampleY = Math.max(
+        0,
+        Math.min(window.innerHeight - 1, navRect.top + navRect.height / 2),
+      );
+
+      const surface = this.document
+        .elementsFromPoint(sampleX, sampleY)
+        .map((element) => element.closest<HTMLElement>('[data-header-surface]'))
+        .find((element): element is HTMLElement => Boolean(element && root.contains(element)));
+
+      const detected = surface?.dataset['headerSurface'];
+      const nextSurface: HeaderSurface =
+        detected === 'limestone' || detected === 'saffron' ? detected : 'dark';
+      if (this.headerSurface() !== nextSurface) this.headerSurface.set(nextSurface);
     };
 
+    const schedule = () => {
+      if (frameId === 0) frameId = window.requestAnimationFrame(updateHeaderSurface);
+    };
+
+    const resizeObserver =
+      typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(schedule);
+    resizeObserver?.observe(nav);
+    surfaces.forEach((surface) => resizeObserver?.observe(surface));
     window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    updateHeaderSurface();
+
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      resizeObserver?.disconnect();
       if (frameId) window.cancelAnimationFrame(frameId);
     });
   }
 
-  private setupMenuEscape() {
+  private setupMenuKeys() {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || !this.menuOpen()) return;
-      this.closeMenu();
-      this.menuButton()?.focus();
+      if (!this.menuOpen()) return;
+
+      if (event.key === 'Escape') {
+        this.closeMenu();
+        this.menuButton()?.focus();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = this.menuFocusable(this.mobileMenu());
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && this.document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && this.document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    document.addEventListener('keydown', onKey);
-    this.destroyRef.onDestroy(() => document.removeEventListener('keydown', onKey));
+
+    this.document.addEventListener('keydown', onKey);
+    this.destroyRef.onDestroy(() => {
+      this.document.removeEventListener('keydown', onKey);
+      this.document.body.classList.remove('menu-is-open');
+    });
+  }
+
+  private setupSectionObserver() {
+    const sections = navigation
+      .map((item) => this.document.querySelector<HTMLElement>(item.href))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible?.target.id) this.activeSection.set(visible.target.id);
+      },
+      { rootMargin: '-28% 0px -58%', threshold: 0 },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    this.destroyRef.onDestroy(() => observer.disconnect());
   }
 }

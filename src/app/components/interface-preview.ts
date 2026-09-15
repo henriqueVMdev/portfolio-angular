@@ -6,9 +6,11 @@ import type { PortfolioProject } from '../data/portfolio';
   template: `
     <figure
       aria-hidden="true"
-      class="interface-preview"
-      [class]="'interface-preview--' + project().preview"
-      [class.interface-preview--compact]="compact()"
+      [class]="
+        'interface-preview interface-preview--' +
+        project().preview +
+        (compact() ? ' interface-preview--compact' : '')
+      "
     >
       <div class="interface-preview__frame">
         <div class="interface-preview__placeholder">

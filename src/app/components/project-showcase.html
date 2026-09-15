@@ -1,0 +1,128 @@
+<section id="projetos" class="project-showcase" aria-labelledby="project-showcase-title">
+  <header class="project-showcase__intro" data-header-surface="limestone">
+    <p class="project-showcase__catalog">
+      <span>Arquivo técnico /</span>
+      <span>IV estratos</span>
+    </p>
+    <div class="project-showcase__intro-copy">
+      <h2 id="project-showcase-title">Sistemas vistos por dentro.</h2>
+      <p>Quatro sistemas abertos ao meio. A superfície primeiro, a estrutura depois.</p>
+      <p>
+        Um sistema em produção, um laboratório de pesquisa, um projeto acadêmico e um
+        produto em desenvolvimento, com profundidade proporcional ao estágio de cada um.
+      </p>
+    </div>
+  </header>
+
+  <div class="project-strata-scene">
+    <div class="project-pillar" aria-hidden="true">
+      <img
+        class="project-pillar__capital"
+        src="/media/ionic-column-capital-front.webp"
+        alt=""
+        width="1536"
+        height="1024"
+        loading="lazy"
+        decoding="async"
+        draggable="false"
+      />
+      <div class="project-pillar__shaft">
+        <img
+          src="/media/ionic-column-shaft.webp"
+          alt=""
+          width="210"
+          height="1314"
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+        />
+      </div>
+    </div>
+
+    <ol class="project-strata" aria-label="Projetos selecionados">
+      @for (project of projects; track project.slug; let projectIndex = $index) {
+        <li class="project-strata__item">
+          <article
+            class="project-stratum"
+            [class]="'project-stratum project-stratum--' + (projectIndex + 1)"
+            [attr.aria-labelledby]="'project-' + project.slug + '-title'"
+            [attr.data-header-surface]="projectIndex % 2 === 1 ? 'limestone' : 'dark'"
+            data-project-stratum
+          >
+            <header class="project-stratum__header">
+              <span class="project-stratum__number" data-project-number aria-hidden="true">
+                {{ project.index }}
+              </span>
+              <p class="project-stratum__category">{{ project.category }}</p>
+              <h3 [id]="'project-' + project.slug + '-title'">{{ project.name }}</h3>
+              <p class="project-stratum__summary">{{ project.summary }}</p>
+            </header>
+
+            <figure class="project-stratum__media" data-project-media>
+              <app-interface-preview [project]="project" [compact]="true" />
+              <figcaption>Preview de {{ project.name }} em preparação</figcaption>
+            </figure>
+
+            <div class="project-stratum__evidence">
+              <p class="project-stratum__notice">{{ project.placeholderNotice }}</p>
+
+              <div class="project-stratum__taxonomies">
+                <section [attr.aria-labelledby]="'project-' + project.slug + '-stack'">
+                  <h4 [id]="'project-' + project.slug + '-stack'">Stack</h4>
+                  <ul>
+                    @for (technology of project.stack; track technology) {
+                      <li>{{ technology }}</li>
+                    }
+                  </ul>
+                </section>
+
+                <section [attr.aria-labelledby]="'project-' + project.slug + '-capabilities'">
+                  <h4 [id]="'project-' + project.slug + '-capabilities'">
+                    {{ project.detailsAvailable === false ? 'Escopo previsto' : 'Capacidades' }}
+                  </h4>
+                  <ul>
+                    @for (capability of project.capabilities; track capability) {
+                      <li>{{ capability }}</li>
+                    }
+                  </ul>
+                </section>
+              </div>
+
+              @if (project.detailsAvailable !== false) {
+                <section
+                  class="project-stratum__architecture"
+                  [attr.aria-labelledby]="'project-' + project.slug + '-architecture'"
+                >
+                  <h4 [id]="'project-' + project.slug + '-architecture'">Arquitetura</h4>
+                  <p>{{ project.description }}</p>
+                </section>
+
+                <app-blueprint-link
+                  class="project-stratum__link"
+                  [href]="'/projetos/' + project.slug"
+                  [label]="'Abrir planta técnica do projeto ' + project.name"
+                >
+                  <span>Explorar planta técnica</span>
+                  <span aria-hidden="true">↗</span>
+                </app-blueprint-link>
+              }
+
+              @if (project.repositoryUrl) {
+                <a
+                  class="project-stratum__repository-link"
+                  [href]="project.repositoryUrl"
+                  target="_blank"
+                  rel="noreferrer"
+                  [attr.aria-label]="'Abrir repositório do projeto ' + project.name + ' no GitHub'"
+                >
+                  <span>GitHub · {{ repoLabel(project.repositoryUrl) }}</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              }
+            </div>
+          </article>
+        </li>
+      }
+    </ol>
+  </div>
+</section>

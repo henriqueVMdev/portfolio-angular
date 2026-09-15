@@ -1,4 +1,20 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router, Routes } from '@angular/router';
+import { getProject } from './data/portfolio';
 import { Home } from './pages/home/home';
 
-export const routes: Routes = [{ path: '', component: Home }];
+const projectExistsGuard: CanActivateFn = (route) => {
+  const project = getProject(route.paramMap.get('slug') ?? '');
+  return project && project.detailsAvailable !== false
+    ? true
+    : inject(Router).parseUrl('/');
+};
+
+export const routes: Routes = [
+  { path: '', component: Home },
+  {
+    path: 'projetos/:slug',
+    loadComponent: () => import('./pages/project/project').then((m) => m.ProjectPage),
+    canActivate: [projectExistsGuard],
+  },
+];
