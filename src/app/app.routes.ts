@@ -21,6 +21,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/basanos/basanos').then((m) => m.BasanosPage),
   },
   {
+    path: 'projetos/omniseg',
+    loadComponent: () => import('./pages/omniseg/omniseg').then((m) => m.OmniSegPage),
+  },
+  {
     path: 'projetos/:slug',
     loadComponent: () => import('./pages/project/project').then((m) => m.ProjectPage),
     canActivate: [projectExistsGuard],

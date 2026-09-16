@@ -1,0 +1,334 @@
+<main class="blueprint-page">
+  <a class="blueprint-skip" href="#conteudo-da-planta">Ir para o conteúdo técnico</a>
+
+  <div class="blueprint-scroll">
+    <header class="blueprint-header">
+      <app-blueprint-link
+        href="/#projetos"
+        class="blueprint-back"
+        label="Fechar planta e voltar aos projetos"
+      >
+        <span class="blueprint-back__arrow" aria-hidden="true">←</span>
+        <span>Fechar planta</span>
+      </app-blueprint-link>
+
+      <p class="blueprint-coordinate">
+        <span>PLANTA {{ project.index }}</span>
+        <span aria-hidden="true"> / </span>
+        <span>OMNISEG</span>
+      </p>
+
+      <span class="blueprint-header__seal" aria-hidden="true">{{ project.index }}</span>
+    </header>
+
+    <section
+      id="visao"
+      class="blueprint-hero blueprint-hero--obverse"
+      aria-labelledby="project-title"
+      aria-describedby="project-description project-notice"
+    >
+      <div class="blueprint-hero__registration" aria-hidden="true">
+        <span>OBV / {{ project.index }}</span>
+        <span>ARQUIVO DE SISTEMA</span>
+        <span>GR 03</span>
+      </div>
+
+      <div class="blueprint-hero__content">
+        <div class="blueprint-hero__copy">
+          <p class="chapter-mark">{{ project.category }}</p>
+          <span class="project-index project-index--large" aria-hidden="true">{{ project.index }}</span>
+          <h1 id="project-title">{{ project.name }}</h1>
+          <p id="project-description" class="blueprint-lead">
+            {{ project.coverDescription ?? project.description }}
+          </p>
+          <p id="project-notice" class="placeholder-notice">{{ project.placeholderNotice }}</p>
+
+          <ul class="stack-line stack-line--large" aria-label="Tecnologias do projeto">
+            @for (item of project.stack; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="blueprint-hero__preview">
+          <app-interface-preview [project]="project" />
+          <p class="blueprint-hero__preview-note">
+            <span>REVERSO</span>
+            Trabalhando nas previews
+          </p>
+        </div>
+      </div>
+
+      <a class="blueprint-hero__continue" href="#planta-tecnica">
+        <span>Descer à placa técnica</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+    </section>
+
+    <div id="planta-tecnica" class="blueprint-sheet blueprint-sheet--technical">
+      <nav class="blueprint-index" aria-label="Índice da planta">
+        <p class="blueprint-index__title">Índice do artefato</p>
+        <ol>
+          <li>
+            <a href="#visao-geral"><span aria-hidden="true">01</span> Visão geral</a>
+          </li>
+          <li>
+            <a href="#regras"><span aria-hidden="true">02</span> As regras</a>
+          </li>
+          <li>
+            <a href="#ciclo"><span aria-hidden="true">03</span> O ciclo</a>
+          </li>
+          <li>
+            <a href="#arquitetura"><span aria-hidden="true">04</span> Arquitetura</a>
+          </li>
+          <li>
+            <a href="#limites"><span aria-hidden="true">05</span> Limites conhecidos</a>
+          </li>
+        </ol>
+        <p class="blueprint-index__folio" aria-hidden="true">
+          {{ project.index }} / {{ projectCount.toString().padStart(2, '0') }}
+        </p>
+      </nav>
+
+      <article
+        id="conteudo-da-planta"
+        class="blueprint-document"
+        aria-labelledby="technical-plate-title"
+      >
+        <header class="blueprint-document__masthead">
+          <div>
+            <p class="chapter-mark">PLACA TÉCNICA</p>
+            <h2 id="technical-plate-title">Leitura do sistema</h2>
+          </div>
+          <p>{{ project.technicalSummary ?? project.summary }}</p>
+          <dl class="blueprint-register">
+            <div>
+              <dt>Registro</dt>
+              <dd>{{ project.index }}</dd>
+            </div>
+            <div>
+              <dt>Classe</dt>
+              <dd>{{ project.category }}</dd>
+            </div>
+            <div>
+              <dt>Estado</dt>
+              <dd>Projeto acadêmico individual · concluído</dd>
+            </div>
+          </dl>
+        </header>
+
+        <section
+          id="visao-geral"
+          class="blueprint-section blueprint-section--overview"
+          aria-labelledby="omniseg-overview-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">1</span>
+            <div>
+              <p class="chapter-mark">VISÃO GERAL</p>
+              <h2 id="omniseg-overview-title">O problema</h2>
+            </div>
+          </header>
+
+          <div class="omniseg-overview__narrative">
+            <p class="omniseg-overview__lead">
+              O controle de EPIs em papel falha de um jeito específico: não falha visivelmente. As fichas continuam sendo preenchidas, o armário continua tendo itens, e o que se perde é a resposta para três perguntas: quem está com o quê, desde quando, e se aquele equipamento ainda está dentro da validade.
+            </p>
+            <p>
+              As duas primeiras custam dinheiro. A terceira custa outra coisa. Um capacete vencido em uso é indistinguível de um capacete novo até o momento em que deixa de ser. Um sistema que registra a saída mas não congela a validade no instante da entrega não sabe a diferença.
+            </p>
+            <p class="omniseg-overview__thesis">
+              O OmniSeg parte daí. O objeto central não é o EPI, é a custódia: o vínculo entre uma pessoa e um item durante um intervalo de tempo.
+            </p>
+          </div>
+        </section>
+
+        <section
+          id="regras"
+          class="blueprint-section omniseg-section--rules"
+          aria-labelledby="omniseg-rules-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">2</span>
+            <div>
+              <p class="chapter-mark">INVARIANTES</p>
+              <h2 id="omniseg-rules-title">As regras</h2>
+              <p class="blueprint-section__intro">Três decisões que valem para todo o sistema.</p>
+            </div>
+          </header>
+
+          <ol class="omniseg-rule-grid">
+            @for (rule of project.decisions; track rule.title; let index = $index) {
+              <li>
+                <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                <article>
+                  <h3>{{ rule.title }}</h3>
+                  <p>{{ rule.body }}</p>
+                </article>
+              </li>
+            }
+          </ol>
+        </section>
+
+        <section
+          id="ciclo"
+          class="blueprint-section omniseg-section--cycle"
+          aria-labelledby="omniseg-cycle-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">3</span>
+            <div>
+              <p class="chapter-mark">CUSTÓDIA</p>
+              <h2 id="omniseg-cycle-title">O ciclo</h2>
+              <p class="blueprint-section__intro">
+                Um pedido nasce em um de dois estados, decidido pela comparação entre a quantidade pedida e o saldo disponível do solicitante, calculado pelo limite menos o que já está em uso. Dentro do teto, entra direto na fila de entrega. Acima, entra na fila de aprovação.
+              </p>
+            </div>
+          </header>
+
+          <figure class="myrias-diagram-card omniseg-diagram-card">
+            <header class="myrias-diagram-card__header">
+              <span aria-hidden="true">01</span>
+              <div>
+                <h3>Estados da custódia</h3>
+              </div>
+            </header>
+            <app-omniseg-svg-diagram
+              diagram="cycle"
+              label="Diagrama rolável: ciclo de custódia em cinco estados do OmniSeg"
+            />
+            <figcaption>Cada transição grava quem decidiu e quando. O estoque só se move nas duas últimas.</figcaption>
+          </figure>
+
+          <div class="omniseg-cycle__notes">
+            <p>
+              O estoque não é debitado na solicitação, apenas na entrega. Isso mantém o pedido barato e reversível, e cria uma janela: entre solicitar e receber, o saldo pode ter mudado. A entrega confere o saldo lido antes de debitar e recusa a operação se ele mudou, o que reduz a janela sem fechá-la, como a seção 05 registra.
+            </p>
+          </div>
+        </section>
+
+        <section
+          id="arquitetura"
+          class="blueprint-section blueprint-section--architecture"
+          aria-labelledby="architecture-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">4</span>
+            <div>
+              <p class="chapter-mark">SISTEMA</p>
+              <h2 id="architecture-title">Arquitetura</h2>
+              <p class="blueprint-section__intro">
+                Aplicação Vue 3 com roteamento por vue-router, servida como estático e consumindo Supabase diretamente para autenticação, dados e arquivos. Não existe camada de serviços: as telas falam com o SDK, e as regras recorrentes, como datas civis, ajuste de estoque e mensagens, vivem em composables.
+              </p>
+            </div>
+          </header>
+
+          <figure class="myrias-diagram-card omniseg-diagram-card">
+            <header class="myrias-diagram-card__header">
+              <span aria-hidden="true">01</span>
+              <div>
+                <h3>Contexto e fronteira</h3>
+              </div>
+            </header>
+            <app-omniseg-svg-diagram
+              diagram="context"
+              label="Diagrama rolável: contexto e fronteira de segurança da aplicação OmniSeg"
+            />
+            <figcaption>
+              Não há caixa entre o navegador e o banco. O que contém o usuário está inteiramente do outro lado da linha.
+            </figcaption>
+          </figure>
+
+          <figure class="myrias-diagram-card omniseg-diagram-card">
+            <header class="myrias-diagram-card__header">
+              <span aria-hidden="true">02</span>
+              <div>
+                <h3>Camadas do cliente</h3>
+              </div>
+            </header>
+            <app-omniseg-svg-diagram
+              diagram="layers"
+              label="Diagrama rolável: camadas do cliente da aplicação OmniSeg"
+            />
+            <figcaption>
+              As telas consomem o SDK diretamente. Funciona neste tamanho e dificulta teste unitário. Essa é a dívida citada em Limites.
+            </figcaption>
+          </figure>
+
+          <div class="omniseg-architecture__copy">
+            <p>
+              Duas escolhas merecem nota. <strong>Datas civis nunca passam por conversão UTC</strong>, pois em fuso negativo isso desloca o dia e um EPI passa a vencer vinte e quatro horas antes do que deveria. E o <strong>ajuste de estoque usa concorrência otimista</strong>: a escrita só ocorre se o saldo ainda for igual ao lido, distinguindo saldo insuficiente de conflito. Reduz atualização perdida sem substituir uma transação.
+            </p>
+            <p>A landing pública não carrega o SDK do Supabase, que fica em um chunk separado de 48 kB comprimido.</p>
+          </div>
+
+          <ul class="capability-list" aria-label="Capacidades do sistema">
+            @for (capability of project.capabilities; track capability) {
+              <li>{{ capability }}</li>
+            }
+          </ul>
+        </section>
+
+        <section
+          id="limites"
+          class="blueprint-section omniseg-section--limits"
+          aria-labelledby="omniseg-limits-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">5</span>
+            <div>
+              <p class="chapter-mark">FRONTEIRAS</p>
+              <h2 id="omniseg-limits-title">Limites conhecidos</h2>
+              <p class="blueprint-section__intro">
+                Levantados por auditoria do próprio código, com severidade atribuída. Estão aqui porque são reais.
+              </p>
+            </div>
+          </header>
+
+          <ol class="omniseg-limit-list">
+            @for (limit of limits; track limit.title; let index = $index) {
+              <li>
+                <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                <article>
+                  <h3>{{ limit.title }}</h3>
+                  <p>{{ limit.body }}</p>
+                </article>
+              </li>
+            }
+          </ol>
+        </section>
+
+        <footer class="blueprint-next" aria-labelledby="next-project-title">
+          <div class="blueprint-next__register">
+            <p class="chapter-mark">PRÓXIMA CUNHAGEM</p>
+            <span aria-hidden="true">{{ next.index }} / {{ projectCount.toString().padStart(2, '0') }}</span>
+          </div>
+          <div class="blueprint-next__copy">
+            <h2 id="next-project-title">{{ next.name }}</h2>
+            <p>
+              Gestão de dezenas de milhares de anúncios com edição em massa, auditoria e assistente de IA sob confirmação humana.
+            </p>
+          </div>
+          <app-blueprint-link
+            [href]="'/projetos/' + next.slug"
+            class="blueprint-next__link"
+            label="Voltar à primeira planta: Myrias"
+          >
+            <span>Voltar à primeira planta</span>
+            <span aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
+                <path
+                  d="M4 12 12 4M5 4h7v7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="square"
+                  stroke-width="1.5"
+                />
+              </svg>
+            </span>
+          </app-blueprint-link>
+        </footer>
+      </article>
+    </div>
+  </div>
+</main>

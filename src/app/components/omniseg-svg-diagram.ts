@@ -1,12 +1,13 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   PLATFORM_ID,
+  afterNextRender,
   effect,
   inject,
   input,
   signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 const diagramFiles = {
@@ -19,6 +20,7 @@ export type OmniSegDiagram = keyof typeof diagramFiles;
 
 @Component({
   selector: 'app-omniseg-svg-diagram',
+  host: { ngSkipHydration: 'true' },
   template: `
     <div
       [class]="'omniseg-svg-diagram omniseg-svg-diagram--' + diagram()"
@@ -36,11 +38,14 @@ export class OmniSegSvgDiagram {
   readonly diagram = input.required<OmniSegDiagram>();
   readonly label = input.required<string>();
   readonly svg = signal<SafeHtml | null>(null);
+  private readonly ready = signal(false);
 
   constructor() {
+    afterNextRender(() => this.ready.set(true));
+
     effect((onCleanup) => {
       const diagram = this.diagram();
-      if (!isPlatformBrowser(this.platform)) return;
+      if (!this.ready() || !isPlatformBrowser(this.platform)) return;
 
       let active = true;
       fetch(`/media/diagramas/omniseg/${diagramFiles[diagram]}`)
