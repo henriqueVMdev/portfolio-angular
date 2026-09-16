@@ -17,6 +17,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/myrias/myrias').then((m) => m.MyriasPage),
   },
   {
+    path: 'projetos/basanos',
+    loadComponent: () => import('./pages/basanos/basanos').then((m) => m.BasanosPage),
+  },
+  {
     path: 'projetos/:slug',
     loadComponent: () => import('./pages/project/project').then((m) => m.ProjectPage),
     canActivate: [projectExistsGuard],
