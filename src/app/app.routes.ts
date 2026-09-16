@@ -13,6 +13,10 @@ const projectExistsGuard: CanActivateFn = (route) => {
 export const routes: Routes = [
   { path: '', component: Home },
   {
+    path: 'projetos/myrias',
+    loadComponent: () => import('./pages/myrias/myrias').then((m) => m.MyriasPage),
+  },
+  {
     path: 'projetos/:slug',
     loadComponent: () => import('./pages/project/project').then((m) => m.ProjectPage),
     canActivate: [projectExistsGuard],

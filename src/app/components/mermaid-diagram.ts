@@ -1,12 +1,13 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
   PLATFORM_ID,
+  afterNextRender,
   effect,
   inject,
   input,
   signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 let renderQueue: Promise<void> = Promise.resolve();
@@ -40,6 +41,7 @@ function renderDiagram(id: string, definition: string) {
 
 @Component({
   selector: 'app-mermaid-diagram',
+  host: { ngSkipHydration: 'true' },
   template: `
     <div
       [class]="'myrias-mermaid myrias-mermaid--' + variant()"
@@ -74,16 +76,19 @@ export class MermaidDiagram {
 
   readonly svg = signal<SafeHtml | null>(null);
   readonly failed = signal(false);
+  private readonly ready = signal(false);
 
   constructor() {
+    afterNextRender(() => this.ready.set(true));
+
     effect((onCleanup) => {
       const definition = this.definition();
-      if (!isPlatformBrowser(this.platform)) return;
+      if (!this.ready() || !isPlatformBrowser(this.platform)) return;
 
       let active = true;
       this.svg.set(null);
       this.failed.set(false);
-      const id = `project-diagram-${++diagramSeq}`;
+      const id = `d${++diagramSeq}`;
 
       renderDiagram(id, definition).then(
         (result) => {

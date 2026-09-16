@@ -3,12 +3,13 @@ import { projects } from './data/portfolio';
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Prerender },
+  { path: 'projetos/myrias', renderMode: RenderMode.Prerender },
   {
     path: 'projetos/:slug',
     renderMode: RenderMode.Prerender,
     async getPrerenderParams() {
       return projects
-        .filter((project) => project.detailsAvailable !== false)
+        .filter((project) => project.detailsAvailable !== false && project.slug !== 'myrias')
         .map((project) => ({ slug: project.slug }));
     },
   },

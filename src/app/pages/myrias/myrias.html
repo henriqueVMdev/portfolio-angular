@@ -1,0 +1,361 @@
+<main class="blueprint-page">
+  <a class="blueprint-skip" href="#conteudo-da-planta">Ir para o conteúdo técnico</a>
+
+  <div class="blueprint-scroll">
+    <header class="blueprint-header">
+      <app-blueprint-link
+        href="/#projetos"
+        class="blueprint-back"
+        label="Fechar planta e voltar aos projetos"
+      >
+        <span class="blueprint-back__arrow" aria-hidden="true">←</span>
+        <span>Fechar planta</span>
+      </app-blueprint-link>
+
+      <p class="blueprint-coordinate">
+        <span>PLANTA {{ project.index }}</span>
+        <span aria-hidden="true"> / </span>
+        <span>MYRIAS</span>
+      </p>
+
+      <span class="blueprint-header__seal" aria-hidden="true">{{ project.index }}</span>
+    </header>
+
+    <section
+      id="visao"
+      class="blueprint-hero blueprint-hero--obverse"
+      aria-labelledby="project-title"
+      aria-describedby="project-description project-notice"
+    >
+      <div class="blueprint-hero__registration" aria-hidden="true">
+        <span>OBV / {{ project.index }}</span>
+        <span>ARQUIVO DE SISTEMA</span>
+        <span>GR 01</span>
+      </div>
+
+      <div class="blueprint-hero__content">
+        <div class="blueprint-hero__copy">
+          <p class="chapter-mark">{{ project.category }}</p>
+          <span class="project-index project-index--large" aria-hidden="true">{{ project.index }}</span>
+          <h1 id="project-title">{{ project.name }}</h1>
+          <p id="project-description" class="blueprint-lead">{{ project.description }}</p>
+          <p id="project-notice" class="placeholder-notice">{{ project.placeholderNotice }}</p>
+
+          <ul class="stack-line stack-line--large" aria-label="Tecnologias do projeto">
+            @for (item of project.stack; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="blueprint-hero__preview">
+          <app-interface-preview [project]="project" />
+          <p class="blueprint-hero__preview-note">
+            <span>REVERSO</span>
+            Trabalhando nas previews
+          </p>
+        </div>
+      </div>
+
+      <a class="blueprint-hero__continue" href="#planta-tecnica">
+        <span>Descer à placa técnica</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+    </section>
+
+    <div id="planta-tecnica" class="blueprint-sheet blueprint-sheet--technical">
+      <nav class="blueprint-index" aria-label="Índice da planta">
+        <p class="blueprint-index__title">Índice do artefato</p>
+        <ol>
+          <li>
+            <a href="#visao-geral"><span aria-hidden="true">01</span> Visão geral</a>
+          </li>
+          <li>
+            <a href="#arquitetura"><span aria-hidden="true">02</span> Arquitetura</a>
+          </li>
+          <li>
+            <a href="#documentacao"><span aria-hidden="true">03</span> Contrato da API</a>
+          </li>
+          <li>
+            <a href="#decisoes"><span aria-hidden="true">04</span> Decisões</a>
+          </li>
+        </ol>
+        <p class="blueprint-index__folio" aria-hidden="true">
+          {{ project.index }} / {{ projectCount.toString().padStart(2, '0') }}
+        </p>
+      </nav>
+
+      <article
+        id="conteudo-da-planta"
+        class="blueprint-document"
+        aria-labelledby="technical-plate-title"
+      >
+        <header class="blueprint-document__masthead">
+          <div>
+            <p class="chapter-mark">PLACA TÉCNICA</p>
+            <h2 id="technical-plate-title">Leitura do sistema</h2>
+          </div>
+          <p>{{ project.summary }}</p>
+          <dl class="blueprint-register">
+            <div>
+              <dt>Registro</dt>
+              <dd>{{ project.index }}</dd>
+            </div>
+            <div>
+              <dt>Classe</dt>
+              <dd>{{ project.category }}</dd>
+            </div>
+            <div>
+              <dt>Estado</dt>
+              <dd>Em produção, usado em operações internas, protegido por firewall</dd>
+            </div>
+          </dl>
+        </header>
+
+        <section
+          id="visao-geral"
+          class="blueprint-section blueprint-section--overview"
+          aria-labelledby="overview-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">1</span>
+            <div>
+              <p class="chapter-mark">VISÃO GERAL</p>
+              <h2 id="overview-title">Da operação manual ao padrão interno</h2>
+              <p class="blueprint-section__intro">
+                O contexto que originou o Myrias, a solução construída e o impacto observado na operação da HRB.
+              </p>
+            </div>
+          </header>
+
+          <div class="myrias-overview__narrative">
+            <article>
+              <p class="myrias-overview__eyebrow">01 / CONTEXTO</p>
+              <h3>O problema</h3>
+              <p>
+                A HRB opera anúncios de autopeças no Mercado Livre em mais de uma conta. Manter esse catálogo alinhado era trabalho manual, anúncio por anúncio: replicar um item da conta principal na secundária, corrigir compatibilidades, ajustar preço e revisar título. Existia um SaaS pago para copiar anúncios, mas ele resolvia apenas a criação, não a manutenção contínua nem a operação em lote.
+              </p>
+            </article>
+
+            <article>
+              <p class="myrias-overview__eyebrow">02 / RESPOSTA</p>
+              <h3>A solução</h3>
+              <p>
+                Um painel próprio que conversa direto com a API do Mercado Livre. Ele conecta várias contas por OAuth, lê o catálogo inteiro, aplica alterações em lote, audita cada escrita e expõe um assistente de IA que analisa a conta e propõe mudanças, sempre com confirmação humana antes de qualquer escrita.
+              </p>
+            </article>
+          </div>
+
+          <div class="myrias-overview__complement">
+            <p class="project-overview__origin">
+              <em>Myrias</em> (μυριάς) era o dez mil dos gregos a maior quantidade que o sistema numérico deles nomeava. Acima disso, contava-se em miríades de miríades. O nome ficou no inglês <em>myriad</em> como "incontável"
+            </p>
+          </div>
+        </section>
+
+        <section
+          id="arquitetura"
+          class="blueprint-section blueprint-section--architecture"
+          aria-labelledby="architecture-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">2</span>
+            <div>
+              <p class="chapter-mark">SISTEMA</p>
+              <h2 id="architecture-title">Arquitetura</h2>
+              <p class="blueprint-section__intro">
+                Uma leitura do fluxo principal, seguida pelas responsabilidades que definem o sistema.
+              </p>
+            </div>
+          </header>
+
+          <div class="myrias-diagram-stack">
+            <figure class="myrias-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">01</span>
+                <div>
+                  <h3>Mapa de pacotes por domínio</h3>
+                  <p>Dependências internas e pontos de concentração do sistema.</p>
+                </div>
+              </header>
+              <app-mermaid-diagram
+                [definition]="packageMap"
+                label="Mapa de dependências entre os pacotes por domínio do Myrias"
+              />
+              <figcaption>
+                Os fluxos convergem no cliente do Mercado Livre; operações sensíveis também registram auditoria em ops.
+              </figcaption>
+            </figure>
+
+            <figure class="myrias-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">02</span>
+                <div>
+                  <h3>Camadas e integrações</h3>
+                  <p>Da sessão do painel às dependências externas e à persistência.</p>
+                </div>
+              </header>
+              <app-mermaid-diagram
+                [definition]="layerFlow"
+                label="Fluxo entre frontend, autenticação, serviços, persistência e integrações externas do Myrias"
+              />
+              <figcaption>
+                O filtro autentica o operador antes do controller; MeliClient e OpenRouterClient isolam as APIs externas.
+              </figcaption>
+            </figure>
+          </div>
+
+          <ul class="capability-list" aria-label="Capacidades do sistema">
+            @for (capability of project.capabilities; track capability) {
+              <li>{{ capability }}</li>
+            }
+          </ul>
+        </section>
+
+        <section
+          id="documentacao"
+          class="blueprint-section blueprint-section--contract"
+          aria-labelledby="documentation-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">3</span>
+            <div>
+              <p class="chapter-mark">CONTRATO</p>
+              <h2 id="documentation-title">Documentação da API</h2>
+              <p class="blueprint-section__intro">
+                Rotas demonstrativas que tornam responsabilidades e limites do projeto legíveis.
+              </p>
+            </div>
+          </header>
+
+          <figure class="myrias-diagram-card myrias-diagram-card--contract">
+            <header class="myrias-diagram-card__header">
+              <span aria-hidden="true">03</span>
+              <div>
+                <h3>Handshake OAuth 2.0 com PKCE</h3>
+                <p>Ordem das trocas entre operador, backend, banco e Mercado Livre.</p>
+              </div>
+            </header>
+            <app-mermaid-diagram
+              [definition]="oauthFlow"
+              label="Sequência do handshake OAuth 2.0 com PKCE do Myrias"
+              variant="sequence"
+            />
+            <figcaption>
+              O verifier persiste no banco para sobreviver a reinícios e o state é consumido uma única vez.
+            </figcaption>
+          </figure>
+
+          <div
+            class="endpoint-table__viewport"
+            role="region"
+            aria-label="Endpoints ilustrativos do projeto"
+            tabindex="0"
+          >
+            <table class="endpoint-table">
+              <caption>Contrato ilustrativo: substituir pelos endpoints reais</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Método</th>
+                  <th scope="col">Rota</th>
+                  <th scope="col">Responsabilidade</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (endpoint of project.endpoints; track endpoint.method + endpoint.path) {
+                  <tr>
+                    <td>
+                      <strong class="endpoint-table__method" [attr.data-method]="endpoint.method.toLowerCase()">
+                        {{ endpoint.method }}
+                      </strong>
+                    </td>
+                    <td>
+                      <code>{{ endpoint.path }}</code>
+                    </td>
+                    <td>{{ endpoint.purpose }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          id="decisoes"
+          class="blueprint-section blueprint-section--decisions"
+          aria-labelledby="decisions-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">4</span>
+            <div>
+              <p class="chapter-mark">RACIONAL</p>
+              <h2 id="decisions-title">Decisões de engenharia</h2>
+              <p class="blueprint-section__intro">
+                O raciocínio por trás da implementação, registrado como parte do artefato.
+              </p>
+            </div>
+          </header>
+
+          <ol class="decision-ledger">
+            @for (decision of project.decisions; track decision.title; let index = $index) {
+              <li>
+                <span class="decision-ledger__index" aria-hidden="true">
+                  {{ (index + 1).toString().padStart(2, '0') }}
+                </span>
+                <article>
+                  <h3>{{ decision.title }}</h3>
+                  <p>{{ decision.body }}</p>
+                  @if (decision.cost || decision.gain) {
+                    <dl class="decision-ledger__tradeoffs">
+                      @if (decision.cost) {
+                        <div>
+                          <dt>Custo</dt>
+                          <dd>{{ decision.cost }}</dd>
+                        </div>
+                      }
+                      @if (decision.gain) {
+                        <div data-outcome="gain">
+                          <dt>Ganho</dt>
+                          <dd>{{ decision.gain }}</dd>
+                        </div>
+                      }
+                    </dl>
+                  }
+                </article>
+              </li>
+            }
+          </ol>
+        </section>
+
+        <footer class="blueprint-next" aria-labelledby="next-project-title">
+          <div class="blueprint-next__register">
+            <p class="chapter-mark">PRÓXIMA CUNHAGEM</p>
+            <span aria-hidden="true">{{ next.index }} / {{ projectCount.toString().padStart(2, '0') }}</span>
+          </div>
+          <div class="blueprint-next__copy">
+            <h2 id="next-project-title">{{ next.name }}</h2>
+            <p>{{ next.summary }}</p>
+          </div>
+          <app-blueprint-link
+            [href]="'/projetos/' + next.slug"
+            class="blueprint-next__link"
+            [label]="'Abrir a planta do projeto ' + next.name"
+          >
+            <span>Examinar próxima planta</span>
+            <span aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
+                <path
+                  d="M4 12 12 4M5 4h7v7"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="square"
+                  stroke-width="1.5"
+                />
+              </svg>
+            </span>
+          </app-blueprint-link>
+        </footer>
+      </article>
+    </div>
+  </div>
+</main>
