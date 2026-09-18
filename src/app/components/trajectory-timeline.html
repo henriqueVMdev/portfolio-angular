@@ -46,14 +46,16 @@
     aria-live="polite"
     aria-atomic="true"
   >
-    <article class="trajectory-timeline__chapter-content">
-      <p class="trajectory-timeline__year">{{ active().ano }}</p>
-      <h3>{{ active().titulo }}</h3>
-      @if (active().subtitulo) {
-        <p class="trajectory-timeline__role">{{ active().subtitulo }}</p>
-      }
-      <p class="trajectory-timeline__text">{{ active().texto }}</p>
-    </article>
+    @for (milestone of [active()]; track milestone.id) {
+      <article class="trajectory-timeline__chapter-content">
+        <p class="trajectory-timeline__year">{{ milestone.ano }}</p>
+        <h3>{{ milestone.titulo }}</h3>
+        @if (milestone.subtitulo) {
+          <p class="trajectory-timeline__role">{{ milestone.subtitulo }}</p>
+        }
+        <p class="trajectory-timeline__text">{{ milestone.texto }}</p>
+      </article>
+    }
   </div>
 
   <div class="trajectory-timeline__controls">

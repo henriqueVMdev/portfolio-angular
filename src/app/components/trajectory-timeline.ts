@@ -6,6 +6,9 @@ const CHART_HEIGHT = 68;
 
 @Component({
   selector: 'app-trajectory-timeline',
+  // ponytail: o grid de .trajectory-stage aponta col/row em .trajectory-timeline;
+  // sem contents o host vira item auto e a carta vai para o meio, o capítulo some.
+  styles: ':host { display: contents; }',
   templateUrl: './trajectory-timeline.html',
 })
 export class TrajectoryTimeline {
@@ -14,8 +17,14 @@ export class TrajectoryTimeline {
   readonly chartHeight = CHART_HEIGHT;
   readonly activeIndex = signal(0);
   readonly active = computed(() => trajectory[this.activeIndex()]);
-  readonly previous = computed(() => trajectory[this.activeIndex() - 1]);
-  readonly next = computed(() => trajectory[this.activeIndex() + 1]);
+  readonly previous = computed(() => {
+    const i = this.activeIndex() - 1;
+    return i >= 0 ? trajectory[i] : undefined;
+  });
+  readonly next = computed(() => {
+    const i = this.activeIndex() + 1;
+    return i < trajectory.length ? trajectory[i] : undefined;
+  });
 
   starState(index: number) {
     const active = this.activeIndex();
