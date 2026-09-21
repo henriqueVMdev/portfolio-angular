@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import {
   Component,
   DestroyRef,
+  ElementRef,
   NgZone,
   afterNextRender,
   inject,
@@ -71,10 +72,10 @@ export class Home {
   private readonly destroyRef = inject(DestroyRef);
   private readonly document = inject(DOCUMENT);
   private readonly zone = inject(NgZone);
-  readonly navRef = viewChild<HTMLElement>('nav');
-  readonly menuButton = viewChild<HTMLButtonElement>('menuButton');
-  readonly mobileMenu = viewChild<HTMLElement>('mobileMenu');
-  readonly shell = viewChild<HTMLElement>('shell');
+  readonly navRef = viewChild<ElementRef<HTMLElement>>('nav');
+  readonly menuButton = viewChild<ElementRef<HTMLButtonElement>>('menuButton');
+  readonly mobileMenu = viewChild<ElementRef<HTMLElement>>('mobileMenu');
+  readonly shell = viewChild<ElementRef<HTMLElement>>('shell');
 
   readonly profile = profile;
   readonly navigation = navigation;
@@ -94,8 +95,8 @@ export class Home {
   readonly primaryContactIsPlaceholder = isPlaceholderContact(this.primaryContact);
   readonly resumeContact = profile.contacts.find((contact) => contact.label === 'Currículo');
 
-  readonly heroStage = viewChild<HTMLElement>('heroStage');
-  readonly heroVideo = viewChild<HTMLVideoElement>('heroVideo');
+  readonly heroStage = viewChild<ElementRef<HTMLElement>>('heroStage');
+  readonly heroVideo = viewChild<ElementRef<HTMLVideoElement>>('heroVideo');
   readonly heroReady = signal(false);
   readonly heroSource = signal<string | undefined>(undefined);
 
@@ -129,7 +130,7 @@ export class Home {
   openMenu() {
     this.menuOpen.set(true);
     this.document.body.classList.add('menu-is-open');
-    const panel = this.mobileMenu();
+    const panel = this.mobileMenu()?.nativeElement;
     const focusable = this.menuFocusable(panel);
     requestAnimationFrame(() => focusable[0]?.focus());
   }
@@ -195,7 +196,7 @@ export class Home {
       navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } }
     ).connection;
     const allowed = !reducedMotion.matches && !connection?.saveData;
-    const stage = this.heroStage();
+    const stage = this.heroStage()?.nativeElement;
 
     if (!allowed) {
       if (stage) {
@@ -208,7 +209,7 @@ export class Home {
     this.heroSource.set('/media/hero-1920-5s.mp4');
 
     requestAnimationFrame(() => {
-      const video = this.heroVideo();
+      const video = this.heroVideo()?.nativeElement;
       if (!stage || !video) return;
 
       const maxTime = 9;
@@ -268,7 +269,7 @@ export class Home {
 
   private setupMotion() {
     gsap.registerPlugin(ScrollTrigger);
-    const root = this.shell();
+    const root = this.shell()?.nativeElement;
     if (!root) return;
 
     const media = gsap.matchMedia();
@@ -418,8 +419,8 @@ export class Home {
   }
 
   private setupNav() {
-    const root = this.shell();
-    const nav = this.navRef();
+    const root = this.shell()?.nativeElement;
+    const nav = this.navRef()?.nativeElement;
     if (!root || !nav) return;
 
     const surfaces = Array.from(root.querySelectorAll<HTMLElement>('[data-header-surface]'));
@@ -487,12 +488,12 @@ export class Home {
 
       if (event.key === 'Escape') {
         this.closeMenu();
-        this.menuButton()?.focus();
+        this.menuButton()?.nativeElement.focus();
         return;
       }
 
       if (event.key !== 'Tab') return;
-      const focusable = this.menuFocusable(this.mobileMenu());
+      const focusable = this.menuFocusable(this.mobileMenu()?.nativeElement);
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];

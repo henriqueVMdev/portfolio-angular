@@ -1,4 +1,12 @@
-import { Component, DestroyRef, Input, afterNextRender, inject, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  Input,
+  afterNextRender,
+  inject,
+  viewChild,
+} from '@angular/core';
 
 type EllipseMask = { cx: number; cy: number; rx: number; ry: number };
 type SafeZone = { x: number; y: number; w: number; h: number };
@@ -95,7 +103,7 @@ const safeZoneAttenuation = (x: number, y: number, zones: SafeZone[]) =>
 export class HeroParticles {
   @Input({ required: true }) lightMask!: ResponsiveValue<EllipseMask>;
   @Input({ required: true }) textSafeZone!: ResponsiveValue<SafeZone>;
-  private readonly canvasRef = viewChild<HTMLCanvasElement>('canvas');
+  private readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
@@ -103,7 +111,7 @@ export class HeroParticles {
   }
 
   private start() {
-    const canvas = this.canvasRef();
+    const canvas = this.canvasRef()?.nativeElement;
     const container = canvas?.parentElement;
     const context = canvas?.getContext('2d', { alpha: true, desynchronized: true });
     if (!canvas || !container || !context) return;

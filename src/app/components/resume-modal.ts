@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
   Component,
+  ElementRef,
   PLATFORM_ID,
   effect,
   inject,
@@ -25,9 +26,9 @@ export class ResumeModal {
   readonly closed = output();
 
   readonly status = signal<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  readonly dialog = viewChild<HTMLDialogElement>('dialog');
-  readonly pages = viewChild<HTMLDivElement>('pages');
-  readonly closeButton = viewChild<HTMLButtonElement>('closeButton');
+  readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('dialog');
+  readonly pages = viewChild<ElementRef<HTMLDivElement>>('pages');
+  readonly closeButton = viewChild<ElementRef<HTMLButtonElement>>('closeButton');
 
   private previousFocus: HTMLElement | null = null;
   private loadingTask: PDFDocumentLoadingTask | null = null;
@@ -38,7 +39,7 @@ export class ResumeModal {
     effect((onCleanup) => {
       if (!isPlatformBrowser(this.platform)) return;
       const open = this.open();
-      const dialog = this.dialog();
+      const dialog = this.dialog()?.nativeElement;
       if (!dialog) return;
 
       if (open) {
@@ -46,7 +47,7 @@ export class ResumeModal {
           document.activeElement instanceof HTMLElement ? document.activeElement : null;
         if (!dialog.open) dialog.showModal();
         document.body.classList.add('resume-is-open');
-        requestAnimationFrame(() => this.closeButton()?.focus());
+        requestAnimationFrame(() => this.closeButton()?.nativeElement.focus());
         void this.loadPdf();
       } else {
         if (dialog.open) dialog.close();
@@ -90,7 +91,7 @@ export class ResumeModal {
   }
 
   private async renderPages(pdf: PDFDocumentProxy) {
-    const host = this.pages();
+    const host = this.pages()?.nativeElement;
     if (!host) return;
 
     const token = ++this.renderToken;
@@ -133,7 +134,7 @@ export class ResumeModal {
     void this.loadingTask?.destroy();
     this.loadingTask = null;
     this.pdf = null;
-    this.pages()?.replaceChildren();
+    this.pages()?.nativeElement.replaceChildren();
     this.status.set('idle');
   }
 }
