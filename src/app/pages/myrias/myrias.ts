@@ -5,6 +5,7 @@ import { BlueprintLink } from '../../components/blueprint-link';
 import { InterfacePreview } from '../../components/interface-preview';
 import { MermaidDiagram } from '../../components/mermaid-diagram';
 import { myriasLayerFlow, myriasOauthFlow, myriasPackageMap } from '../../data/myrias-diagrams';
+import { myriasIdentities, myriasLimits, myriasResults } from '../../data/myrias-content';
 import { getProject, profile, projects } from '../../data/portfolio';
 
 @Component({
@@ -19,6 +20,9 @@ export class MyriasPage {
   readonly packageMap = myriasPackageMap;
   readonly layerFlow = myriasLayerFlow;
   readonly oauthFlow = myriasOauthFlow;
+  readonly results = myriasResults;
+  readonly identities = myriasIdentities;
+  readonly limits = myriasLimits;
 
   constructor() {
     const title = `${this.project.name} · ${this.project.category} · ${profile.name}`;

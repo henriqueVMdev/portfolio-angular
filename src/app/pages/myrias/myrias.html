@@ -79,6 +79,9 @@
           <li>
             <a [routerLink]="[]" fragment="decisoes"><span aria-hidden="true">04</span> Decisões</a>
           </li>
+          <li>
+            <a [routerLink]="[]" fragment="limites"><span aria-hidden="true">05</span> Limites conhecidos</a>
+          </li>
         </ol>
         <p class="blueprint-index__folio" aria-hidden="true">
           {{ project.index }} / {{ projectCount.toString().padStart(2, '0') }}
@@ -107,7 +110,9 @@
             </div>
             <div>
               <dt>Estado</dt>
-              <dd>Em produção, usado em operações internas, protegido por firewall</dd>
+              <dd>
+                Em produção, com usuários internos, recebendo features novas. Arquitetura documentada em outubro de 2026
+              </dd>
             </div>
           </dl>
         </header>
@@ -133,7 +138,7 @@
               <p class="myrias-overview__eyebrow">01 / CONTEXTO</p>
               <h3>O problema</h3>
               <p>
-                A HRB opera anúncios de autopeças no Mercado Livre em mais de uma conta. Manter esse catálogo alinhado era trabalho manual, anúncio por anúncio: replicar um item da conta principal na secundária, corrigir compatibilidades, ajustar preço e revisar título. Existia um SaaS pago para copiar anúncios, mas ele resolvia apenas a criação, não a manutenção contínua nem a operação em lote.
+                A HRB opera anúncios de autopeças no Mercado Livre em até quatro contas. Manter esse catálogo alinhado era trabalho manual, anúncio por anúncio. Existia um SaaS pago para copiar anúncios, mas ele resolvia só a criação, não a manutenção contínua nem a operação em lote.
               </p>
             </article>
 
@@ -141,12 +146,30 @@
               <p class="myrias-overview__eyebrow">02 / RESPOSTA</p>
               <h3>A solução</h3>
               <p>
-                Um painel próprio que conversa direto com a API do Mercado Livre. Ele conecta várias contas por OAuth, lê o catálogo inteiro, aplica alterações em lote, audita cada escrita e expõe um assistente de IA que analisa a conta e propõe mudanças, sempre com confirmação humana antes de qualquer escrita.
+                Um painel próprio que fala direto com a API do Mercado Livre: conecta várias contas por OAuth, espelha o catálogo inteiro numa base local, aplica alterações em lote, audita cada escrita, automatiza promoções e preços por quantidade, e expõe um assistente de IA que analisa a conta e propõe mudanças — sempre com confirmação humana antes de qualquer escrita.
               </p>
             </article>
           </div>
 
+          <section class="myrias-results" aria-labelledby="results-title">
+            <header>
+              <h3 id="results-title">Resultados</h3>
+              <p class="myrias-overview__eyebrow">03 / MEDIÇÃO</p>
+            </header>
+            <ul>
+              @for (result of results; track result.figure) {
+                <li>
+                  <strong>{{ result.figure }}</strong>
+                  <span>{{ result.caption }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+
           <div class="myrias-overview__complement">
+            <p>
+              O SaaS de terceiros foi cancelado depois que a ferramenta interna virou o padrão de operação da empresa.
+            </p>
             <p class="project-overview__origin">
               <em>Myrias</em> (μυριάς) era o dez mil dos gregos a maior quantidade que o sistema numérico deles nomeava. Acima disso, contava-se em miríades de miríades. O nome ficou no inglês <em>myriad</em> como "incontável"
             </p>
@@ -205,6 +228,140 @@
             </figure>
           </div>
 
+          <ol class="decision-ledger">
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">01</span>
+              <article>
+                <h3>Organização por domínio</h3>
+                <p>
+                  O pacote raiz se divide por área de negócio, não por camada técnica: <code>auth</code>, <code>meli</code>, <code>catalog</code>, <code>perf</code>, <code>sales</code>, <code>partresearch</code>, <code>descriptions</code>, <code>ai</code>, <code>quality</code>, <code>competition</code>, <code>dashboard</code>, <code>ops</code>, <code>scripts</code> e <code>config</code>. Cada um traz controller, service e entidades juntos. O fluxo padrão tem três camadas, sem interface para implementação única.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">02</span>
+              <article>
+                <h3>O catálogo local é a espinha</h3>
+                <p>
+                  A mudança estrutural mais recente, e a que mais mudou o sistema. Antes, cada tela perguntava ao Mercado Livre — inventário, qualidade e concorrência faziam cada uma a sua varredura completa por noite, e o pico das três derrubava o backend. A tela de promoções por anúncio, que exige um GET por anúncio porque a API não tem multiget, ficava presa a 100 anúncios por página, com total e filtros valendo só sobre a janela varrida.
+                </p>
+                <p>
+                  Hoje existe um espelho local do catálogo. A varredura das 00:30 é a única, e as demais telas leem dela.
+                </p>
+                <ul class="myrias-points">
+                  <li>
+                    <strong>Filtro virou <code>where</code>.</strong> Cada consumidor recebe só as linhas que pediu, em vez de desserializar o corpo inteiro de um snapshot.
+                  </li>
+                  <li>
+                    <strong>Custo, estoque real e SKU ganharam onde morar.</strong> A tela de vendas monta margem sem uma chamada por anúncio.
+                  </li>
+                  <li>
+                    <strong>Frescor sem custo de API.</strong> O <code>PUT</code> de edição já devolve o anúncio atualizado, então a linha é gravada com o que voltou. Zero chamadas extras. O que muda fora do painel chega por webhook.
+                  </li>
+                </ul>
+                <dl class="decision-ledger__tradeoffs">
+                  <div>
+                    <dt>Custo</dt>
+                    <dd>
+                      Os dados são de ontem enquanto o webhook não chega, e a tabela local vira uma segunda fonte de verdade que pode divergir do marketplace.
+                    </dd>
+                  </div>
+                </dl>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">03</span>
+              <article>
+                <h3>As duas identidades, e uma terceira</h3>
+                <p>
+                  <em>Quem é você</em> e <em>em nome de qual loja você age</em> são perguntas separadas. Trocar a conta ativa não mexe na sessão; sair do painel não desconecta as contas.
+                </p>
+
+                <div
+                  class="endpoint-table__viewport"
+                  role="region"
+                  aria-label="Comparação entre a identidade do painel e a da conta do Mercado Livre"
+                  tabindex="0"
+                >
+                  <table class="endpoint-table">
+                    <thead>
+                      <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Quem usa o painel</th>
+                        <th scope="col">Qual conta operar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (row of identities; track row.aspect) {
+                        <tr>
+                          <th scope="row">{{ row.aspect }}</th>
+                          <td>{{ row.panel }}</td>
+                          <td>{{ row.account }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                <p>
+                  Acima disso existe um terceiro portão: uma chave de permissão pode ser marcada como exclusiva de desenvolvedor, e nem administrador passa. É assim que uma tela em teste fica no ar em produção sem aparecer para a operação.
+                </p>
+                <p>
+                  A sessão é revogável: o cookie assinado exige um registro vivo no banco, com teto de oito horas e rotação de chave sem derrubar quem está logado.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">04</span>
+              <article>
+                <h3>Integração com o Mercado Livre</h3>
+                <p>
+                  Um único cliente concentra quatro responsabilidades: garantir token válido por chamada com renovação proativa, recuperar de 401 forçando refresh uma vez por requisição, aplicar backoff exponencial com jitter em 429/423/409 e 5xx, e respeitar o limite de requisições. O limitador tem prioridade: o clique do operador passa na frente da varredura noturna.
+                </p>
+                <p>Os tokens ficam cifrados em repouso, com rotação que relê e recifra no startup.</p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">05</span>
+              <article>
+                <h3>Webhooks, ligados por medição</h3>
+                <p>
+                  O marketplace manda cerca de 1.300 notificações por hora. Em vez de consumir tudo, os tópicos foram religados por etapas, com medição a cada uma: preços primeiro, depois o tópico de item, depois a ação de preço por quantidade. Dois tópicos ficaram de fora por decisão medida — um porque não entregou um evento sequer em quatro janelas de observação, outro porque é a tarefa mais pesada de uma fila que já tem backlog.
+                </p>
+                <p>
+                  O dedupe é por anúncio, não por evento: repetição do mesmo anúncio colapsa numa tarefa só.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">06</span>
+              <article>
+                <h3>Automações</h3>
+                <p>
+                  Duas escrevem no Mercado Livre sozinhas — promoções por categoria e preços por quantidade — e seguem o mesmo desenho: a regra é uma função pura, sem I/O, que recebe dados já gravados e devolve a decisão. Quem escreve é o service que já trata cache, evento e auditoria.
+                </p>
+                <p>
+                  Como a decisão inteira são alguns <code>select</code>s, a simulação responde no tempo de uma requisição: o operador vê o que aconteceria antes de ligar, usando exatamente a mesma função da execução real. A automação se recusa a agir sobre varredura com mais de 26 horas.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">07</span>
+              <article>
+                <h3>O host é o teto</h3>
+                <p>
+                  O backend roda num host de <strong>1 vCPU e 2 GB</strong>. Isso moldou boot preguiçoso, GC serial, concorrência de fila em 3 e virtual threads ligadas. O trabalho é espera de HTTP, não CPU — o backend fica entre 0,3% e 5,8% de uso.
+                </p>
+              </article>
+            </li>
+          </ol>
+
           <ul class="capability-list" aria-label="Capacidades do sistema">
             @for (capability of project.capabilities; track capability) {
               <li>{{ capability }}</li>
@@ -221,9 +378,9 @@
             <span class="blueprint-section__serial" aria-hidden="true">3</span>
             <div>
               <p class="chapter-mark">CONTRATO</p>
-              <h2 id="documentation-title">Documentação da API</h2>
+              <h2 id="documentation-title">Contrato da API</h2>
               <p class="blueprint-section__intro">
-                Rotas demonstrativas que tornam responsabilidades e limites do projeto legíveis.
+                Convenções, erros e portões de autorização — o que um cliente precisa saber antes da primeira chamada.
               </p>
             </div>
           </header>
@@ -246,19 +403,94 @@
             </figcaption>
           </figure>
 
+          <ol class="decision-ledger">
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">01</span>
+              <article>
+                <h3>Convenções</h3>
+                <p>Base <code>/api</code>, JSON nas duas direções, datas em ISO-8601, dinheiro como número.</p>
+                <p>
+                  Campos em <code>snake_case</code>. Começou assim porque o frontend original consumia esse formato, e continua assim por consistência — as telas novas, que nasceram aqui e não têm equivalente no backend anterior, seguem o mesmo padrão. No Java os campos são <code>camelCase</code> e o mapeamento é explícito por anotação: renomear um campo interno não pode mudar o contrato.
+                </p>
+                <p>
+                  <strong>Não há versionamento de URL.</strong> Cliente e servidor sobem juntos; o contrato é estável por disciplina, não por <code>/v1</code>.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">02</span>
+              <article>
+                <h3>Autenticação e CSRF</h3>
+                <p>
+                  Duas credenciais independentes. A sessão do painel é um cookie <code>HttpOnly</code>, <code>SameSite=Lax</code>, <code>Secure</code>, com teto de oito horas. A conta do Mercado Livre é implícita: o endpoint opera sobre a conta ativa, e nenhuma rota recebe conta por parâmetro — as exceções são as rotas multiconta, que agem sobre todas.
+                </p>
+                <p>
+                  Todo método que altera exige <code>X-CSRF-Token</code>. O servidor devolve o token vigente no header de toda resposta autenticada, e o cliente reenvia o último que recebeu.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">03</span>
+              <article>
+                <h3>Erros</h3>
+                <p>
+                  Formato único: <code>&#123;"detail": "..."&#125;</code>. Os códigos seguem o esperado, com duas particularidades.
+                </p>
+                <p>
+                  <strong><code>502</code> significa falha ao falar com o Mercado Livre ou com o provedor de LLM</strong> — não é erro do cliente, é integração externa caindo, e a tela precisa distinguir uma coisa da outra.
+                </p>
+                <p>
+                  <strong><code>429</code> é o único com corpo estendido</strong>, porque o cliente precisa decidir se repete:
+                </p>
+                <pre class="myrias-code"><code>&#123;
+  "detail": "Você passou de 15 operações pesadas por minuto — este limite é do app, não do Mercado Livre, e o pedido nem chegou a ser enviado. Aguarde 60s e refaça só o que faltou.",
+  "code": "app_rate_limit",
+  "retry_after_seconds": 60
+&#125;</code></pre>
+                <p>
+                  A mensagem diz explicitamente que o limite é do app. O rate limit do marketplace é tratado dentro do backend com backoff e <strong>nunca vaza como 429 para a tela</strong> — se vazasse, o operador não teria como saber se o problema é dele ou do Mercado Livre.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">04</span>
+              <article>
+                <h3>Rastreio</h3>
+                <p>
+                  <code>X-Request-ID</code> é aceito do cliente ou gerado pelo backend, e sempre volta na resposta. O mesmo id entra nos logs e na coluna correspondente da trilha de auditoria: é por ele que se liga um clique numa tela a uma escrita registrada no marketplace.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">05</span>
+              <article>
+                <h3>Operações longas</h3>
+                <p>
+                  Tudo que varre muitos anúncios segue o mesmo par: um <code>POST</code> que devolve <code>&#123;job_id&#125;</code> e um <code>GET</code> de progresso que a tela consulta em polling. O job pertence a quem o criou e vive no Redis com lease, então um deploy no meio do lote não o perde. O padrão se repete em edição em massa, clone e busca de kits.
+                </p>
+              </article>
+            </li>
+          </ol>
+
           <div
             class="endpoint-table__viewport"
             role="region"
-            aria-label="Endpoints ilustrativos do projeto"
+            aria-label="Autorização por rota"
             tabindex="0"
           >
             <table class="endpoint-table">
-              <caption>Contrato ilustrativo: substituir pelos endpoints reais</caption>
+              <caption>
+                Recorte representativo. O contrato completo tem cerca de 120 rotas e vive no repositório.
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">Método</th>
                   <th scope="col">Rota</th>
-                  <th scope="col">Responsabilidade</th>
+                  <th scope="col">Permissão</th>
                 </tr>
               </thead>
               <tbody>
@@ -278,6 +510,34 @@
               </tbody>
             </table>
           </div>
+
+          <ol class="decision-ledger">
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">06</span>
+              <article>
+                <h3>Três linhas carregam o desenho inteiro</h3>
+                <p>
+                  <strong>A permissão pode depender do conteúdo, não só da rota.</strong> Editar um anúncio exige <code>bulk_edit</code>; encerrar exige <code>delete_listing</code>. É o mesmo <code>PUT</code>.
+                </p>
+                <p>
+                  <strong>A permissão pode recortar a resposta.</strong> Quem não tem <code>bulk_edit</code> exporta a planilha só com as colunas internas, e a importação grava só essas. Preço, estoque e status continuam sendo edição em massa.
+                </p>
+                <p>
+                  <strong>A confirmação da IA revalida.</strong> O chat nunca escreve: uma ferramenta de escrita vira pendência com prazo, e no confirm a permissão real da ação é checada de novo. Se o usuário perdeu a permissão nesse meio tempo, a ação morre com <code>403</code>.
+                </p>
+              </article>
+            </li>
+
+            <li>
+              <span class="decision-ledger__index" aria-hidden="true">07</span>
+              <article>
+                <h3>Webhooks</h3>
+                <p>
+                  Autenticam pelo corpo, não por cookie, e <strong>sempre respondem <code>200</code></strong> — para o marketplace, recebido é recebido, e devolver erro só faria ele reenviar. O que vira trabalho de verdade é decidido por configuração, e o dedupe é por anúncio, não por id de evento.
+                </p>
+              </article>
+            </li>
+          </ol>
         </section>
 
         <section
@@ -291,7 +551,7 @@
               <p class="chapter-mark">RACIONAL</p>
               <h2 id="decisions-title">Decisões de engenharia</h2>
               <p class="blueprint-section__intro">
-                O raciocínio por trás da implementação, registrado como parte do artefato.
+                Decisão, por quê, custo e ganho — registrados como parte do artefato.
               </p>
             </div>
           </header>
@@ -321,6 +581,35 @@
                       }
                     </dl>
                   }
+                </article>
+              </li>
+            }
+          </ol>
+        </section>
+
+        <section
+          id="limites"
+          class="blueprint-section myrias-section--limits"
+          aria-labelledby="myrias-limits-title"
+        >
+          <header class="blueprint-section__header">
+            <span class="blueprint-section__serial" aria-hidden="true">5</span>
+            <div>
+              <p class="chapter-mark">FRONTEIRAS</p>
+              <h2 id="myrias-limits-title">Limites conhecidos</h2>
+              <p class="blueprint-section__intro">
+                O que o sistema não faz, documentado com a mesma clareza do que ele faz.
+              </p>
+            </div>
+          </header>
+
+          <ol class="myrias-limit-list">
+            @for (limit of limits; track limit.title; let index = $index) {
+              <li>
+                <span aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                <article>
+                  <h3>{{ limit.title }}</h3>
+                  <p>{{ limit.body }}</p>
                 </article>
               </li>
             }

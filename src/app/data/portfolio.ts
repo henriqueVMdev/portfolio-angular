@@ -51,83 +51,151 @@ export const projects: PortfolioProject[] = [
     name: "Myrias",
     category: "PLATAFORMA DE OPERAÇÕES DE MARKETPLACE",
     summary:
-      "Gestão de dezenas de milhares de anúncios do Mercado Livre em múltiplas contas, com edição em massa, auditoria e um assistente de IA que escreve com conferência e permissão do usuário.",
+      "Gestão de anúncios do Mercado Livre em múltiplas contas, com catálogo espelhado localmente, automações que escrevem sozinhas e um assistente que não escreve sem confirmação humana.",
     description:
-      "Backend Spring Boot organizado por domínio, não por camada: cada pacote traz seu controller, service e entidades juntos. Duas identidades independentes atravessam quase toda rota: quem opera o painel e em nome de qual conta do Mercado Livre a ação acontece. O acesso à API externa passa por um único cliente que concentra token, retry e rate limit, porque o gargalo do sistema é a cota do marketplace, não o servidor.",
+      "Backend organizado por domínio, com o catálogo do Mercado Livre espelhado numa tabela local que serve todas as telas. Uma varredura noturna alimenta o espelho; o retorno das edições e os webhooks mantêm ele fresco. Duas identidades independentes atravessam quase toda rota: quem opera o painel e em nome de qual conta a ação acontece. Roda num host de 1 vCPU, e isso não é detalhe de infraestrutura — é a restrição que moldou quase toda decisão de performance.",
     placeholderNotice:
-      "Sistema interno em produção na HRB Imports.",
+      "Sistema interno em produção na HRB Imports. Substituiu um SaaS pago de terceiros e virou o padrão de operação da empresa.",
     repositoryUrl: "https://github.com/henriqueVMdev/MyriasPublic",
     stack: [
       "Java 21",
       "Spring Boot 3",
       "PostgreSQL",
-      "JPA / Hibernate",
+      "Redis",
+      "Flyway",
       "Vue 3",
       "Vite",
+      "Tailwind",
       "Docker",
-      "JUnit",
-      "OpenRouter",
+      "GitHub Actions",
+      "Python",
     ],
     capabilities: [
-      "OAuth 2.0 PKCE",
       "Multi-conta",
-      "Edição em massa",
-      "Rate limiting",
-      "Trilha de auditoria",
-      "Agente de IA com confirmação humana",
+      "Catálogo espelhado",
+      "Automações",
+      "Fila distribuída",
+      "Rate limiting com prioridade",
+      "Auditoria append-only",
+      "Criptografia em repouso",
+      "Assistente com confirmação humana",
       "Webhooks",
-      "Jobs agendados",
-      "CI/CD",
+      "Import/export por planilha",
     ],
     decisions: [
       {
-        title: "Autenticação própria em vez de Spring Security",
+        title: "O catálogo do marketplace espelhado numa tabela local",
         body:
-          "O modelo de acesso é uma lista de chaves de permissão por usuário, guardada em coluna JSON, deliberadamente simples, porque a operação tem rotatividade alta e adicionar alguém precisa ser questão de marcar caixas. Trazer o Spring Security significaria traduzir esse modelo para o vocabulário do framework sem ganhar nada em troca. Entrou só o BCrypt; a sessão e a checagem são um filtro e uma classe chamada explicitamente nos controllers.",
+          "Cada tela perguntava ao Mercado Livre, e três varreduras noturnas concorrentes estouravam a memória do host. A varredura das 00:30 passou a ser a única fonte, e as demais telas leem dela em SQL.",
         cost:
-          "A verificação é explícita por endpoint, o que exige disciplina ao adicionar rotas.",
+          "O dado é de ontem até o webhook chegar, e a tabela vira uma segunda fonte de verdade que pode divergir do marketplace.",
         gain:
-          "O caminho de autenticação inteiro cabe em duas classes; dá para auditar o fluxo de ponta a ponta sem sair do código do projeto.",
+          "Um scan em vez de quatro, filtros e totais reais sobre o catálogo inteiro, e telas que respondem em SQL em vez de em chamadas de API.",
       },
       {
-        title: "Spring MVC bloqueante em vez de WebFlux",
+        title: "Sessão assinada com revogação no servidor",
         body:
-          "O teto de throughput do sistema não é CPU nem número de threads. É a cota de requisições da API do Mercado Livre, e o rate limiter já a respeita. Reativo compraria complexidade de leitura e de depuração sem comprar vazão. O paralelismo onde importa vem de CompletableFuture sobre um pool fixo, dimensionado pela mesma concorrência do limitador.",
-        cost:
-          "Uma thread ocupada por requisição enquanto ela espera a resposta do marketplace.",
+          "O cookie carrega usuário, sessão, emissão e versão de chave sob HMAC, mas a validação também exige uma linha viva no banco. Assinatura impede adulteração e não impede que um cookie roubado valha até expirar.",
+        cost: "Uma consulta curta por requisição — o preço de não ser stateless.",
         gain:
-          "Stack trace inteiro e depuração direta: um erro em produção aponta a linha, não um encadeamento de operadores.",
+          "Logout real, revogação imediata em troca de senha, e rotação de chave sem derrubar sessões ativas.",
+      },
+      {
+        title: "Autenticação própria em vez de Spring Security",
+        body:
+          "O modelo de acesso é uma lista de chaves de permissão por usuário, e o starter traria configuração para resolver um problema já resolvido. Entra só o BCrypt.",
+        cost:
+          "A verificação é explícita em cada controller, o que exige disciplina ao criar rotas.",
+        gain:
+          "O fluxo de autorização inteiro cabe em dois arquivos auditáveis, sem indireção entre a rota e a regra.",
       },
       {
         title: "Escrita da IA sempre confirmada por humano",
         body:
-          "O assistente recebe as ferramentas que a permissão do usuário libera, e o modelo decide quais chamar. As de leitura executam direto dentro do loop. As de escrita não executam: viram uma pendência com prazo de validade, e a permissão real da ação é revalidada no momento em que o operador confirma, não apenas quando a ferramenta foi oferecida ao modelo.",
-        cost: "Um clique a mais, e as pendências se perdem no restart.",
-        gain: "Um modelo alucinando não altera preço de anúncio.",
+          "O modelo só enxerga as ferramentas que a permissão do usuário libera. Leitura executa no loop; escrita vira pendência com prazo, e a permissão é revalidada no clique de confirmar.",
+        cost: "Um clique a mais, e a pendência expira em dez minutos.",
+        gain:
+          "Um modelo alucinando não altera preço de anúncio — e a mesma regra vale para escrita em banco e para chamada de API.",
       },
       {
-        title: "Chave de sessão que falha no startup fora de desenvolvimento",
+        title: "Regra de automação como função pura",
         body:
-          "O cookie de sessão é assinado por HMAC, e a chave tem um valor padrão no repositório para o ambiente local. Um deploy sem a variável configurada assinaria sessões de produção com uma chave pública. Qualquer um forjaria o cookie de qualquer usuário. A aplicação recusa subir nessa condição.",
+          "As regras que decidem promoção e preço por quantidade não fazem I/O: recebem os dados gravados e devolvem a decisão. Quem escreve é o service que já existe.",
         cost:
-          "Nenhum. Configuração errada vira falha visível em vez de brecha silenciosa.",
+          "A regra só enxerga o que a varredura gravou — decisão boa sobre dado velho continua sendo decisão ruim.",
         gain:
-          "A falha mais grave possível no sistema deixa de depender de alguém lembrar de configurar uma variável.",
+          "A simulação da tela usa a mesma função da execução real, então o preview não mente, e não existe segunda cópia da regra para divergir.",
       },
       {
-        title: "Cache curto em vez de truncar a varredura",
+        title: "Auditoria append-only por trigger no banco",
         body:
-          "Listar os SKUs disponíveis exige varrer todos os anúncios de todas as contas conectadas, uma operação cara. A alternativa descartada era parar num teto e devolver o que deu tempo, porque mostrar uma lista incompleta como se fosse completa é pior que demorar. A saída foi varrer inteiro e guardar o resultado por alguns minutos.",
-        cost:
-          "Edição feita fora do painel demora esse intervalo para aparecer.",
+          "Update e delete bloqueados no próprio banco, só a rotina de retenção passa; payloads sanitizados antes de gravar.",
+        cost: "Corrigir um registro só por linha nova.",
         gain:
-          "A lista sempre reflete o catálogo inteiro, e a varredura cara roda uma vez a cada poucos minutos em vez de a cada abertura de tela.",
+          "A trilha não vira repositório de segredos nem pode ser reescrita por quem tem acesso ao banco.",
+      },
+      {
+        title: "Rate limiter com prioridade",
+        body:
+          "A versão anterior não tinha, e a previsão escrita na época era que, se a auditoria noturna atrasasse o operador, prioridade seria o próximo passo. Foi o que aconteceu.",
+        cost:
+          "Prioridade só existe no modo local, e todo fan-out precisa capturar o contexto antes de disparar.",
+        gain: "O clique do operador não espera a varredura de milhares de anúncios.",
+      },
+      {
+        title: "Custo esparso, nunca zero",
+        body:
+          "Kit cujo componente não tem custo cadastrado fica sem custo, não com custo zero.",
+        cost: "Um componente sem cadastro tira o kit inteiro das análises de margem.",
+        gain:
+          "A tela mostra um traço em vez de margem inflada; número errado sobre dinheiro é pior que a ausência dele.",
+      },
+      {
+        title: "Planilha como interface de edição em massa",
+        body:
+          "A operação já vivia no Excel, então o catálogo exporta e reimporta em CSV ou xlsx, lido sem biblioteca externa, e só a célula que mudou vira escrita.",
+        cost:
+          "O import é síncrono, e volume grande vai estourar o request antes de virar job.",
+        gain: "Zero dependência nova e nenhuma escrita desnecessária no marketplace.",
+      },
+      {
+        title: "Flyway em produção, Hibernate só valida",
+        body:
+          "O schema muda por migração versionada, nunca por inferência do ORM no startup.",
+        cost: "Toda mudança de entidade exige migração antes do deploy, e já são 25.",
+        gain: "Schema muda apenas por alteração revisável, com histórico e ordem.",
       },
     ],
     endpoints: [
-      { method: "POST", path: "/operations", purpose: "Registra uma nova operação idempotente" },
-      { method: "GET", path: "/operations/:id", purpose: "Consulta estado e trilha de eventos" },
-      { method: "POST", path: "/webhooks/provider", purpose: "Recebe atualizações externas verificadas" },
+      { method: "POST", path: "/api/app/login", purpose: "aberta" },
+      { method: "GET", path: "/api/app/session", purpose: "aberta" },
+      { method: "GET", path: "/api/auth/login", purpose: "manage_accounts" },
+      { method: "POST", path: "/api/auth/accounts/switch", purpose: "manage_accounts" },
+      { method: "GET", path: "/api/items", purpose: "performance" },
+      {
+        method: "PUT",
+        path: "/api/items/{itemId}",
+        purpose: "bulk_edit, ou delete_listing se o status for encerrar",
+      },
+      { method: "POST", path: "/api/items/upload-picture", purpose: "upload_images" },
+      { method: "GET", path: "/api/bulk/skus/all", purpose: "só sessão" },
+      { method: "POST", path: "/api/bulk/update-multi/jobs", purpose: "bulk_edit" },
+      { method: "GET", path: "/api/bulk/jobs/{jobId}", purpose: "bulk_edit" },
+      {
+        method: "GET",
+        path: "/api/catalog/spreadsheet",
+        purpose: "só sessão; colunas de edição exigem bulk_edit",
+      },
+      { method: "POST", path: "/api/promotions/automation/preview", purpose: "promocoes" },
+      { method: "POST", path: "/api/promotions/items", purpose: "manage_promotions" },
+      { method: "GET", path: "/api/sales", purpose: "vendas, chave isolada para desenvolvedor" },
+      { method: "POST", path: "/api/ai/chat", purpose: "assistente" },
+      {
+        method: "POST",
+        path: "/api/ai/actions/{id}/confirm",
+        purpose: "assistente mais a permissão real da ação",
+      },
+      { method: "POST", path: "/api/webhooks", purpose: "aberta" },
     ],
     diagram: {
       nodes: [
