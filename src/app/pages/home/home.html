@@ -75,21 +75,19 @@
           fetchpriority="high"
           draggable="false"
         />
-        @if (heroSource()) {
-          <video
-            #heroVideo
-            class="cinematic-media__video timed-hero-media__video"
-            [src]="heroSource()"
-            muted
-            autoplay
-            playsinline
-            preload="auto"
-            poster="/media/hero-1920-poster.jpg"
-            tabindex="-1"
-            disablePictureInPicture
-            (error)="onHeroError()"
-          ></video>
-        }
+        <video
+          #heroVideo
+          class="cinematic-media__video timed-hero-media__video"
+          [attr.src]="heroSource()"
+          muted
+          autoplay
+          playsinline
+          preload="auto"
+          poster="/media/hero-1920-poster.jpg"
+          tabindex="-1"
+          disablePictureInPicture
+          (error)="onHeroError()"
+        ></video>
       </div>
       <app-hero-particles
         [lightMask]="heroParticles.lightMask"

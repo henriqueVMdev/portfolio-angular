@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { BlueprintLink } from '../../components/blueprint-link';
 import { InterfacePreview } from '../../components/interface-preview';
@@ -8,7 +9,7 @@ import { getProject, profile, projects } from '../../data/portfolio';
 
 @Component({
   selector: 'app-myrias',
-  imports: [BlueprintLink, InterfacePreview, MermaidDiagram],
+  imports: [RouterLink, BlueprintLink, InterfacePreview, MermaidDiagram],
   templateUrl: './myrias.html',
 })
 export class MyriasPage {

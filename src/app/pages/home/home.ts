@@ -98,7 +98,7 @@ export class Home {
   readonly heroStage = viewChild<ElementRef<HTMLElement>>('heroStage');
   readonly heroVideo = viewChild<ElementRef<HTMLVideoElement>>('heroVideo');
   readonly heroReady = signal(false);
-  readonly heroSource = signal<string | undefined>(undefined);
+  readonly heroSource = signal<string | null>(null);
 
   get contactBusy() {
     return this.contactStatus() === 'sending';
@@ -120,7 +120,7 @@ export class Home {
 
   onHeroError() {
     this.heroReady.set(false);
-    this.heroSource.set(undefined);
+    this.heroSource.set(null);
   }
 
   toggleMenu() {
@@ -195,75 +195,83 @@ export class Home {
     const connection = (
       navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } }
     ).connection;
-    const allowed = !reducedMotion.matches && !connection?.saveData;
     const stage = this.heroStage()?.nativeElement;
+    const video = this.heroVideo()?.nativeElement;
+    if (!stage || !video) return;
 
-    if (!allowed) {
-      if (stage) {
-        stage.dataset['heroMotion'] = 'static';
-        stage.style.setProperty('--hero-progress', '0');
-      }
+    // ponytail: o atributo `muted` so alimenta a propriedade IDL quando o parser cria o
+    // elemento (HTML do SSR). Criado pelo Angular (navegacao de rota, HMR), `video.muted`
+    // fica false e o Chrome recusa o autoplay.
+    video.muted = true;
+
+    stage.style.setProperty('--hero-progress', '0');
+
+    if (reducedMotion.matches || connection?.saveData) {
+      stage.dataset['heroMotion'] = 'static';
       return;
     }
 
+    const maxTime = 9;
+    let stopTime = maxTime;
+    let started = false;
+    let finished = false;
+
+    stage.dataset['heroMotion'] = 'autoplay';
+
+    const stop = () => {
+      if (finished) return;
+      finished = true;
+      video.pause();
+      try {
+        video.currentTime = stopTime;
+      } catch {
+        /* keep last frame */
+      }
+      stage.style.setProperty('--hero-progress', '1');
+      stage.dataset['heroMotion'] = 'complete';
+    };
+
+    const onMeta = () => {
+      stopTime = Number.isFinite(video.duration)
+        ? Math.min(maxTime, Math.max(0, video.duration))
+        : maxTime;
+    };
+
+    const onTime = () => {
+      if (video.currentTime >= stopTime - 1 / 120 || video.ended) {
+        stop();
+        return;
+      }
+      stage.style.setProperty(
+        '--hero-progress',
+        (stopTime > 0 ? Math.min(1, video.currentTime / stopTime) : 1).toFixed(4),
+      );
+    };
+
+    // ponytail: o poster so pode sair depois que ha frame decodificado,
+    // senao o video aparece preto entre o play() e o primeiro frame.
+    const onData = () => {
+      if (started || finished) return;
+      started = true;
+      this.heroReady.set(true);
+      void video.play().catch(() => {
+        stage.dataset['heroMotion'] = 'blocked';
+      });
+    };
+
+    video.addEventListener('loadedmetadata', onMeta);
+    video.addEventListener('loadeddata', onData);
+    video.addEventListener('timeupdate', onTime);
+    video.addEventListener('ended', stop);
+
     this.heroSource.set('/media/hero-1920-5s.mp4');
 
-    requestAnimationFrame(() => {
-      const video = this.heroVideo()?.nativeElement;
-      if (!stage || !video) return;
-
-      const maxTime = 9;
-      let stopTime = maxTime;
-      let finished = false;
-
-      stage.dataset['heroMotion'] = 'autoplay';
-      stage.style.setProperty('--hero-progress', '0');
-
-      const stop = () => {
-        if (finished) return;
-        finished = true;
-        video.pause();
-        try {
-          video.currentTime = stopTime;
-        } catch {
-          /* keep last frame */
-        }
-        stage.style.setProperty('--hero-progress', '1');
-        stage.dataset['heroMotion'] = 'complete';
-      };
-
-      const onMeta = () => {
-        stopTime = Number.isFinite(video.duration)
-          ? Math.min(maxTime, Math.max(0, video.duration))
-          : maxTime;
-      };
-      const onTime = () => {
-        if (video.currentTime >= stopTime - 1 / 120 || video.ended) {
-          stop();
-          return;
-        }
-        stage.style.setProperty(
-          '--hero-progress',
-          (stopTime > 0 ? Math.min(1, video.currentTime / stopTime) : 1).toFixed(4),
-        );
-      };
-
-      video.addEventListener('loadedmetadata', onMeta);
-      video.addEventListener('timeupdate', onTime);
-      video.addEventListener('ended', stop);
-      void video
-        .play()
-        .then(() => this.heroReady.set(true))
-        .catch(() => {
-          stage.dataset['heroMotion'] = 'blocked';
-        });
-
-      this.destroyRef.onDestroy(() => {
-        video.removeEventListener('loadedmetadata', onMeta);
-        video.removeEventListener('timeupdate', onTime);
-        video.removeEventListener('ended', stop);
-        video.pause();
-      });
+    this.destroyRef.onDestroy(() => {
+      video.removeEventListener('loadedmetadata', onMeta);
+      video.removeEventListener('loadeddata', onData);
+      video.removeEventListener('timeupdate', onTime);
+      video.removeEventListener('ended', stop);
+      video.pause();
     });
   }
 

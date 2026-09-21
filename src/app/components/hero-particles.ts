@@ -112,7 +112,9 @@ export class HeroParticles {
 
   private start() {
     const canvas = this.canvasRef()?.nativeElement;
-    const container = canvas?.parentElement;
+    // ponytail: o host <app-hero-particles> e display:contents, nao gera caixa,
+    // entao medir por parentElement da 0x0. O offsetParent do canvas absoluto e a .hero.
+    const container = (canvas?.offsetParent as HTMLElement | null) ?? canvas?.parentElement;
     const context = canvas?.getContext('2d', { alpha: true, desynchronized: true });
     if (!canvas || !container || !context) return;
 
