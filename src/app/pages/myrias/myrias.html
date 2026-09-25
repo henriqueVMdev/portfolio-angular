@@ -214,6 +214,7 @@
               <app-mermaid-diagram
                 [definition]="packageMap"
                 label="Mapa de dependências entre os pacotes por domínio do Myrias"
+                description="Nove pacotes organizados por domínio. auth, ai, perf, quality e competition dependem de meli, que concentra OAuth, anúncios, edição em massa, clone, perguntas, mensagens, promoções e webhooks. dashboard consolida perf e quality. meli e ai registram em ops, onde vivem o OperationLog e o CurrentActor. config, com CORS, conversores JPA e o seeder de desenvolvimento, apoia auth e meli sem regra de domínio."
               />
               <figcaption>
                 Os fluxos convergem no cliente do Mercado Livre; operações sensíveis também registram auditoria em ops.
@@ -231,6 +232,7 @@
               <app-mermaid-diagram
                 [definition]="layerFlow"
                 label="Fluxo entre frontend, autenticação, serviços, persistência e integrações externas do Myrias"
+                description="O frontend Vue 3 com Vite manda o cookie app_session pelo proxy /api. O AppAuthFilter autentica e entrega appUserId e CurrentActor ao controller, que valida a entrada e chama PanelSecurity.require. O controller chama o serviço, uma classe concreta sem interface que guarda a regra de negócio. O serviço usa o repository Spring Data JPA, gravando no PostgreSQL em produção e no H2 em desenvolvimento, com schema por Flyway. Para fora, passa pelo MeliClient, que cuida de token válido, backoff e rate limit até a API do Mercado Livre, e pelo OpenRouterClient, que atende o chat com tools."
               />
               <figcaption>
                 O filtro autentica o operador antes do controller; MeliClient e OpenRouterClient isolam as APIs externas.
@@ -461,6 +463,7 @@
             <app-mermaid-diagram
               [definition]="oauthFlow"
               label="Sequência do handshake OAuth 2.0 com PKCE do Myrias"
+              description="O operador chama /api/auth/login. O backend gera o code_verifier e o code_challenge S256 e grava o verifier em pkce_states, indexado pelo state: ele vive no banco, não em memória, então o handshake sobrevive a um restart do container. O operador é levado ao Mercado Livre, autoriza, e o Mercado Livre chama o callback com code e state. State inexistente ou já usado registra auth_events com falha e devolve 400. State válido é consumido e apagado, uso único, e o backend troca code e verifier por access_token e refresh_token. Com quatro contas já conectadas devolve 409; havendo vaga, grava meli_tokens, registra auth_events com sucesso e conecta a conta. Dali em diante o MeliClient renova o token cinco minutos antes de expirar."
               variant="sequence"
             />
             <figcaption>

@@ -55,13 +55,18 @@ function renderDiagram(id: string, definition: string) {
         <div class="myrias-mermaid__canvas" aria-hidden="true" [innerHTML]="svg()"></div>
       } @else {
         <p class="myrias-mermaid__status">
-          {{ failed() ? 'Diagrama indisponível.' : 'Preparando diagrama…' }}
+          {{ failed() ? 'Diagrama indisponível. A leitura em texto está logo abaixo.' : 'Preparando diagrama…' }}
         </p>
       }
-      @if (description()) {
-        <span [id]="descriptionId" class="visually-hidden">{{ description() }}</span>
-      }
     </div>
+    <!-- No celular o SVG encolhe até o rótulo ficar ilegível: o texto é a leitura real.
+         É também a descrição do role=img, então o leitor de tela não ouve duas vezes. -->
+    @if (description()) {
+      <details class="myrias-mermaid__text" [open]="failed()">
+        <summary>Ler o diagrama em texto</summary>
+        <p [id]="descriptionId">{{ description() }}</p>
+      </details>
+    }
   `,
 })
 export class MermaidDiagram {

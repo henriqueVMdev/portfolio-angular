@@ -1234,18 +1234,6 @@ video {
   font-weight: 500;
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
 .preview-evidence--custody {
   display: grid;
   align-items: center;
@@ -3782,6 +3770,59 @@ video {
   font-family: var(--font-mono), monospace;
   font-size: 0.55rem;
   line-height: 1.55;
+}
+
+/* Leitura em texto do diagrama. No desktop o SVG é legível e o bloco some,
+   a não ser que o diagrama falhe (aí ele já nasce aberto). */
+.myrias-mermaid__text {
+  margin-top: 0.9rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.myrias-mermaid__text summary {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.myrias-mermaid__text summary::-webkit-details-marker {
+  display: none;
+}
+
+.myrias-mermaid__text summary::after {
+  color: var(--bronze-dark);
+  content: '+';
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 240ms var(--ease-material);
+}
+
+.myrias-mermaid__text[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.myrias-mermaid__text p {
+  max-width: 65ch;
+  margin: 0.2rem 0 1.1rem;
+  color: color-mix(in srgb, currentColor 84%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+@media (min-width: 681px) {
+  .myrias-mermaid__text:not([open]) {
+    display: none;
+  }
 }
 
 /* Mobile: em vez de rolar na horizontal (que lia como "cortado"), o diagrama

@@ -195,6 +195,7 @@
             <app-mermaid-diagram
               [definition]="funnel"
               label="Funil de validação de estratégias do Basanos"
+              description="Uma hipótese vira implementação sob contrato e passa por backtest, aplicação de custos com cenário pessimista e validação walk-forward. Sem retenção fora da amostra, é reprovada. Com retenção, segue para Monte Carlo e teste de permutação; se não sobrevive ao reembaralhamento, é reprovada. Passando, vai para execução simulada. Sem paridade com o backtest, volta para diagnóstico de dados, preenchimento e custos, e daí para a implementação. Com paridade, é aprovada para capital reduzido."
             />
             <figcaption>
               Cada transição preserva o veredito; reprovar cedo é uma saída esperada do sistema.
@@ -238,6 +239,7 @@
             <app-mermaid-diagram
               [definition]="architecture"
               label="Arquitetura da aplicação Basanos"
+              description="A SPA Vue 3 fala com a API Flask por REST. A API aciona os motores quantitativos, com backtest, otimizador, walk-forward e Monte Carlo, e a automação, com runner e executores. Os dois usam as mesmas estratégias plugáveis e a mesma camada de dados de mercado, que normaliza as fontes externas. A automação guarda o estado operacional em SQLite com WAL; os motores quantitativos usam Parquet e cache em memória."
             />
             <figcaption>
               A camada de dados e os plugins são compartilhados pelos motores quantitativos e pela execução.
