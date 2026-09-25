@@ -133,6 +133,24 @@
             </div>
           </header>
 
+          <figure class="myrias-diagram-card myrias-diagram-card--contract">
+            <header class="myrias-diagram-card__header">
+              <span aria-hidden="true">01</span>
+              <div>
+                <h3>Contexto do sistema</h3>
+                <p>Quem fala com o Myrias, e com quem o Myrias fala.</p>
+              </div>
+            </header>
+            <app-mermaid-diagram
+              [definition]="contextFlow"
+              label="Diagrama de contexto do Myrias: operador, painel, backend, espelho do catálogo, fila, Mercado Livre e OpenRouter"
+              description="O operador da HRB usa o painel Vue e a planilha CSV. O backend Spring Boot, num host de 1 vCPU e 2 GB, mantém o espelho do catálogo em PostgreSQL e uma fila de tarefas em Redis. A varredura das 00:30 e as escritas auditadas vão para o Mercado Livre, que devolve cerca de 1.300 notificações por hora para a fila, deduplicadas por anúncio. O OpenRouter atende o chat com tools, e nenhuma escrita sai dele sem confirmação."
+            />
+            <figcaption>
+              O gargalo não é o servidor: é a cota de requisições do marketplace, e é por isso que o espelho existe.
+            </figcaption>
+          </figure>
+
           <div class="myrias-overview__narrative">
             <article>
               <p class="myrias-overview__eyebrow">01 / CONTEXTO</p>
@@ -195,7 +213,7 @@
           <div class="myrias-diagram-stack">
             <figure class="myrias-diagram-card">
               <header class="myrias-diagram-card__header">
-                <span aria-hidden="true">01</span>
+                <span aria-hidden="true">02</span>
                 <div>
                   <h3>Mapa de pacotes por domínio</h3>
                   <p>Dependências internas e pontos de concentração do sistema.</p>
@@ -212,7 +230,7 @@
 
             <figure class="myrias-diagram-card">
               <header class="myrias-diagram-card__header">
-                <span aria-hidden="true">02</span>
+                <span aria-hidden="true">03</span>
                 <div>
                   <h3>Camadas e integrações</h3>
                   <p>Da sessão do painel às dependências externas e à persistência.</p>
@@ -224,6 +242,42 @@
               />
               <figcaption>
                 O filtro autentica o operador antes do controller; MeliClient e OpenRouterClient isolam as APIs externas.
+              </figcaption>
+            </figure>
+
+            <figure class="myrias-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">04</span>
+                <div>
+                  <h3>Fluxo do catálogo local</h3>
+                  <p>Quem escreve no espelho, e quem passou a ler dele em vez de perguntar à API.</p>
+                </div>
+              </header>
+              <app-mermaid-diagram
+                [definition]="catalogFlow"
+                label="Fluxo do catálogo espelhado do Myrias: varredura noturna, edições e webhooks alimentando a tabela local, e as telas lendo dela"
+                description="A varredura das 00:30 é a única do dia e traz o catálogo inteiro para o espelho. A edição pelo painel grava o anúncio que o próprio PUT devolveu, sem chamada extra. Os webhooks entram numa fila Redis deduplicada por anúncio e atualizam a linha. Inventário, qualidade, concorrência, promoções, vendas e automações leem do espelho em SQL, sem chamar a API."
+              />
+              <figcaption>
+                As telas leem com SELECT e WHERE, sem chamar a API. Três varreduras concorrentes viraram uma, e o custo está escrito: enquanto o webhook não chega, o dado é de ontem.
+              </figcaption>
+            </figure>
+
+            <figure class="myrias-diagram-card">
+              <header class="myrias-diagram-card__header">
+                <span aria-hidden="true">05</span>
+                <div>
+                  <h3>Modelo de dados</h3>
+                  <p>As tabelas onde as decisões desta página ficaram gravadas.</p>
+                </div>
+              </header>
+              <app-mermaid-diagram
+                [definition]="dataModel"
+                label="Modelo de dados do Myrias: usuários, sessões, contas e tokens do Mercado Livre, catálogo espelhado, custos, trilha de auditoria e pendências da IA"
+                description="app_users guarda as chaves de permissão em JSON e o hash BCrypt, e abre app_sessions com teto de oito horas e versão de chave. Cada conta do Mercado Livre tem um meli_tokens cifrado em repouso e consome pkce_states de uso único. catalog_items é o espelho, com synced_at, preço e estoque; item_costs é esparso, então custo ausente nunca vira zero. operation_log é append-only por trigger, guarda o X-Request-ID e payload sanitizado. ai_pending_actions expira em dez minutos e carrega a permissão revalidada no confirm."
+              />
+              <figcaption>
+                A auditoria é append-only por trigger, não por convenção: update e delete são bloqueados no próprio banco.
               </figcaption>
             </figure>
           </div>
@@ -387,7 +441,26 @@
 
           <figure class="myrias-diagram-card myrias-diagram-card--contract">
             <header class="myrias-diagram-card__header">
-              <span aria-hidden="true">03</span>
+              <span aria-hidden="true">06</span>
+              <div>
+                <h3>Os portões de autorização</h3>
+                <p>Tudo o que uma escrita atravessa entre o clique e a chamada ao marketplace.</p>
+              </div>
+            </header>
+            <app-mermaid-diagram
+              [definition]="authGates"
+              label="Sequência dos portões de autorização do Myrias: sessão, CSRF, permissão por rota, permissão por conteúdo e chave exclusiva de desenvolvedor"
+              description="O AppAuthFilter confere o HMAC do cookie, a versão da chave e o teto de oito horas, e ainda exige uma sessão viva no banco: sessão revogada devolve 401. Passando, o filtro entrega ao controller as duas identidades, o usuário e a conta ativa. O controller confere o X-CSRF-Token e chama PanelSecurity.require com bulk_edit, somando delete_listing se o corpo pedir para encerrar o anúncio. Chave exclusiva de desenvolvedor devolve 403 até para administrador. Autorizado, a escrita vai para a conta ativa, e o espelho e o operation_log são gravados com o X-Request-ID. A IA passa pelos mesmos portões, e o require roda de novo no confirm."
+              variant="sequence"
+            />
+            <figcaption>
+              A permissão depende da rota, do conteúdo do corpo e de quem é o usuário — as três coisas, na mesma requisição.
+            </figcaption>
+          </figure>
+
+          <figure class="myrias-diagram-card myrias-diagram-card--contract">
+            <header class="myrias-diagram-card__header">
+              <span aria-hidden="true">07</span>
               <div>
                 <h3>Handshake OAuth 2.0 com PKCE</h3>
                 <p>Ordem das trocas entre operador, backend, banco e Mercado Livre.</p>

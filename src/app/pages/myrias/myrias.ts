@@ -4,7 +4,15 @@ import { Meta, Title } from '@angular/platform-browser';
 import { BlueprintLink } from '../../components/blueprint-link';
 import { InterfacePreview } from '../../components/interface-preview';
 import { MermaidDiagram } from '../../components/mermaid-diagram';
-import { myriasLayerFlow, myriasOauthFlow, myriasPackageMap } from '../../data/myrias-diagrams';
+import {
+  myriasAuthGates,
+  myriasCatalogFlow,
+  myriasContextFlow,
+  myriasDataModel,
+  myriasLayerFlow,
+  myriasOauthFlow,
+  myriasPackageMap,
+} from '../../data/myrias-diagrams';
 import { myriasIdentities, myriasLimits, myriasResults } from '../../data/myrias-content';
 import { getProject, profile, projects } from '../../data/portfolio';
 
@@ -20,6 +28,10 @@ export class MyriasPage {
   readonly packageMap = myriasPackageMap;
   readonly layerFlow = myriasLayerFlow;
   readonly oauthFlow = myriasOauthFlow;
+  readonly contextFlow = myriasContextFlow;
+  readonly catalogFlow = myriasCatalogFlow;
+  readonly dataModel = myriasDataModel;
+  readonly authGates = myriasAuthGates;
   readonly results = myriasResults;
   readonly identities = myriasIdentities;
   readonly limits = myriasLimits;
