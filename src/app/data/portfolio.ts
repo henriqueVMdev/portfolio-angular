@@ -42,8 +42,7 @@ export const projects: PortfolioProject[] = [
     description:
       "Backend organizado por domínio, com o catálogo do Mercado Livre espelhado numa tabela local que serve todas as telas. Uma varredura noturna alimenta o espelho; o retorno das edições e os webhooks mantêm ele fresco. Duas identidades independentes atravessam quase toda rota: quem opera o painel e em nome de qual conta a ação acontece. Roda num host de 1 vCPU, e isso não é detalhe de infraestrutura — é a restrição que moldou quase toda decisão de performance.",
     placeholderNotice:
-      "Sistema interno em produção na HRB Imports. Substituiu um SaaS pago de terceiros e virou o padrão de operação da empresa.",
-    repositoryUrl: "https://github.com/henriqueVMdev/MyriasPublic",
+      "Sistema interno em produção na HRB Imports. Substituiu um SaaS pago de terceiros e virou o padrão de operação da empresa. Código em repositório fechado: abrir não é permitido por contrato.",
     stack: [
       "Java 21",
       "Spring Boot 3",
