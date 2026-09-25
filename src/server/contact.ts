@@ -34,15 +34,17 @@ export async function handleContact(
 
   const apiKey = process.env['RESEND_API_KEY']?.trim();
   if (!apiKey) {
+    console.error('[contact] RESEND_API_KEY ausente');
     return {
       status: 503,
-      body: { error: 'Envio de email não configurado. Defina RESEND_API_KEY.' },
+      body: { error: 'Envio de email indisponível no momento.' },
     };
   }
 
   const to = readContactEmail();
   if (!to || !EMAIL_PATTERN.test(to)) {
-    return { status: 500, body: { error: 'Destinatário de contato inválido.' } };
+    console.error('[contact] CONTACT_TO_EMAIL inválido');
+    return { status: 500, body: { error: 'Envio de email indisponível no momento.' } };
   }
 
   const from = typeof body.from === 'string' ? body.from.trim() : '';

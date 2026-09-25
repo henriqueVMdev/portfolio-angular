@@ -59,7 +59,7 @@ app.use((_req, res, next) => {
 
 app.post('/api/contact', express.json({ limit: '32kb' }), async (req, res) => {
   try {
-    const result = await handleContact(req.body, req.headers['x-forwarded-for'], req.ip);
+    const result = await handleContact(req.body ?? {}, req.headers['x-forwarded-for'], req.ip);
     if (result.retryAfter) res.setHeader('Retry-After', String(result.retryAfter));
     res.status(result.status).json(result.body);
   } catch {
