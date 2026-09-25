@@ -45,6 +45,18 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+// ponytail: só os cabeçalhos que não quebram nada. CSP completa ficou de fora:
+// o Angular SSR injeta CSS crítico com onload inline e o mermaid gera estilos inline.
+app.disable('x-powered-by');
+app.use((_req, res, next) => {
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'none'");
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
 app.post('/api/contact', express.json({ limit: '32kb' }), async (req, res) => {
   try {
     const result = await handleContact(req.body, req.headers['x-forwarded-for'], req.ip);
