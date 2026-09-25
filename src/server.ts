@@ -32,6 +32,14 @@ function loadDotEnv() {
 
 loadDotEnv();
 
+// ponytail: o Angular derruba a resposta inteira para client-side rendering ao
+// receber QUALQUER x-forwarded-* que não confia, e o default só cobre host e proto.
+// Um x-forwarded-for da Vercel, ou o x-forwarded-port padrão do nginx, desligaria o
+// SSR do site sem erro: HTTP 200 com casca vazia. Lista os cinco que o Angular
+// reconhece mais o x-forwarded-ssl do nginx. A env ainda sobrescreve.
+process.env['NG_TRUST_PROXY_HEADERS'] ??=
+  'x-forwarded-for,x-forwarded-host,x-forwarded-proto,x-forwarded-port,x-forwarded-prefix,x-forwarded-ssl';
+
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
