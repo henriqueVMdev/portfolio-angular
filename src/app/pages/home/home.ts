@@ -9,7 +9,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { profile } from '../../data/portfolio';
@@ -17,6 +16,7 @@ import { HeroParticles } from '../../components/hero-particles';
 import { ProjectShowcase } from '../../components/project-showcase';
 import { ResumeModal } from '../../components/resume-modal';
 import { TrajectoryTimeline } from '../../components/trajectory-timeline';
+import { setPageMeta } from '../../seo';
 
 const navigation = [
   { href: '#inicio', label: 'Início' },
@@ -109,6 +109,11 @@ export class Home {
   }
 
   constructor() {
+    setPageMeta(
+      `${profile.name} · Backend / Fullstack · Portfólio`,
+      'Projetos, arquitetura e decisões de engenharia de um desenvolvedor Backend / Fullstack.',
+    );
+
     afterNextRender(() => {
       this.setupHeroVideo();
       this.setupMotion();

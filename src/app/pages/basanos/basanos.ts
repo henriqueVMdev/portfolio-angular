@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Meta, Title } from '@angular/platform-browser';
+import { setPageMeta } from '../../seo';
 import { BlueprintLink } from '../../components/blueprint-link';
 import { InterfacePreview } from '../../components/interface-preview';
 import { MermaidDiagram } from '../../components/mermaid-diagram';
@@ -21,8 +21,7 @@ export class BasanosPage {
   readonly limits = basanosLimits;
 
   constructor() {
-    const title = `${this.project.name} · ${this.project.category} · ${profile.name}`;
-    inject(Title).setTitle(title);
-    inject(Meta).updateTag({ name: 'description', content: this.project.summary });
+    const title = `${this.project.name} · ${this.project.category.toLowerCase()} · ${profile.name}`;
+    setPageMeta(title, this.project.summary);
   }
 }
