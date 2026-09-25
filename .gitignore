@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Segredos locais (RESEND_API_KEY etc.)
+.env
+.env.*
+!.env.example
