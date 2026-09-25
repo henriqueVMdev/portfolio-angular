@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { setPageMeta } from '../../seo';
 import { BlueprintLink } from '../../components/blueprint-link';
-import { InterfacePreview } from '../../components/interface-preview';
+import { BlueprintContact } from '../../components/blueprint-contact';
 import { MermaidDiagram } from '../../components/mermaid-diagram';
 import { basanosArchitecture, basanosFunnel, basanosLimits } from '../../data/basanos-content';
 import { getProject, profile, projects } from '../../data/portfolio';
 
 @Component({
   selector: 'app-basanos',
-  imports: [RouterLink, BlueprintLink, InterfacePreview, MermaidDiagram],
+  imports: [RouterLink, BlueprintLink, BlueprintContact, MermaidDiagram],
   templateUrl: './basanos.html',
 })
 export class BasanosPage {

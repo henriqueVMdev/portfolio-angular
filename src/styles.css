@@ -2960,23 +2960,70 @@ video {
   padding: 0.5rem 0.65rem;
 }
 
-.blueprint-hero__preview {
-  position: relative;
+.blueprint-reverse {
+  align-self: end;
 }
 
-.blueprint-hero__preview-note {
+.blueprint-reverse__title {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: baseline;
   gap: 1rem;
-  margin: 0.8rem 0 0;
-  color: rgba(232, 225, 210, 0.62);
+  margin: 0 0 0.4rem;
+  color: rgba(232, 225, 210, 0.72);
   font-family: var(--font-mono), monospace;
-  font-size: 0.52rem;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.blueprint-hero__preview-note span {
+.blueprint-reverse__title span {
   color: var(--verdigris);
+}
+
+.blueprint-reverse__list {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--line-light);
+  list-style: none;
+}
+
+.blueprint-reverse__list li {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 0.8fr) minmax(0, 1.2fr);
+  align-items: baseline;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: clamp(1.1rem, 2.4vw, 1.8rem) 0;
+  border-top: 1px solid var(--line-light);
+}
+
+.blueprint-reverse__list strong {
+  color: var(--bronze-light);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2rem, 3.6vw, 3.4rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.blueprint-reverse__list span {
+  max-width: 38ch;
+  color: rgba(232, 225, 210, 0.74);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 680px) {
+  .blueprint-reverse__list li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+}
+
+/* Planta sem reverso: o texto ocupa a largura toda em vez de deixar meia tela vazia. */
+.blueprint-hero__content:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .blueprint-hero__continue {
@@ -3194,8 +3241,7 @@ video {
   text-transform: uppercase;
 }
 
-.myrias-overview__narrative h3,
-.myrias-results h3 {
+.myrias-overview__narrative h3 {
   margin: 0;
   font-family: var(--font-display), sans-serif;
   font-size: clamp(1.6rem, 3vw, 2.6rem);
@@ -3621,62 +3667,6 @@ video {
   color: rgba(232, 225, 210, 0.7);
 }
 
-.myrias-results {
-  margin-top: clamp(3.5rem, 8vw, 7rem);
-}
-
-.myrias-results > header {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.myrias-results ul {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 1.5rem 0 0;
-  padding: 0;
-  border-top: 1px solid var(--line-dark);
-  border-bottom: 1px solid var(--line-dark);
-  list-style: none;
-}
-
-.myrias-results li {
-  display: flex;
-  min-height: 13rem;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 2rem;
-  padding: clamp(1.3rem, 3vw, 2.4rem);
-  border-right: 1px solid var(--line-dark);
-}
-
-.myrias-results li:first-child {
-  padding-left: 0;
-}
-
-.myrias-results li:last-child {
-  padding-right: 0;
-  border-right: 0;
-}
-
-.myrias-results strong {
-  color: var(--bronze-dark);
-  font-family: var(--font-display), sans-serif;
-  font-size: clamp(2rem, 4vw, 3.8rem);
-  font-weight: 500;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-}
-
-.myrias-results span {
-  max-width: 30ch;
-  color: rgba(21, 27, 27, 0.72);
-  font-size: 0.85rem;
-  line-height: 1.55;
-}
-
 .blueprint-architecture {
   margin: clamp(3rem, 7vw, 7rem) 0 0;
 }
@@ -3985,6 +3975,52 @@ video {
   --stratum-accent: var(--bronze-light);
 }
 
+.blueprint-contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(2rem, 5vw, 5rem);
+  padding: var(--section-space) var(--page-gutter) clamp(3.5rem, 7vw, 6rem);
+  background: var(--aegean-deep);
+  color: var(--limestone);
+}
+
+.blueprint-contact h2 {
+  max-width: 13ch;
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.9rem, 3.8vw, 3.4rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.blueprint-contact__body p {
+  max-width: 44ch;
+  margin: 0;
+  color: rgba(232, 225, 210, 0.74);
+}
+
+.blueprint-contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 2rem;
+  margin-top: 1.6rem;
+}
+
+.blueprint-contact + .blueprint-next {
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  border-top: 1px solid var(--line-light);
+}
+
+@media (max-width: 680px) {
+  .blueprint-contact {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
 /* Pointer-specific states ---------------------------------------------- */
 
 @media (hover: hover) and (pointer: fine) {
@@ -4252,11 +4288,6 @@ video {
     left: var(--page-gutter);
     width: auto;
     height: 1px;
-  }
-
-  .blueprint-hero__preview {
-    width: min(100%, 52rem);
-    justify-self: end;
   }
 
   .blueprint-sheet {
@@ -4946,8 +4977,7 @@ video {
     font-size: 2.4rem;
   }
 
-  .myrias-overview__narrative,
-  .myrias-results ul {
+  .myrias-overview__narrative {
     grid-template-columns: 1fr;
   }
 
@@ -5018,19 +5048,6 @@ video {
   .myrias-limit-list > li {
     min-height: 0;
     padding: 1.5rem 1rem;
-  }
-
-  .myrias-results li,
-  .myrias-results li:first-child,
-  .myrias-results li:last-child {
-    min-height: 10rem;
-    padding: 1.5rem 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--line-dark);
-  }
-
-  .myrias-results li:last-child {
-    border-bottom: 0;
   }
 
   .decision-ledger > li {
@@ -5158,23 +5175,6 @@ video {
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-@media (max-width: 680px) {
-  .myrias-results ul {
-    grid-template-columns: 1fr;
-  }
-
-  .myrias-results li {
-    min-height: 0;
-    padding: 1.4rem 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--line-dark);
-  }
-
-  .myrias-results li:last-child {
-    border-bottom: 0;
-  }
 }
 
 /* Tabela dentro do ledger: cabe na coluna de texto, sem viewport rolável. */

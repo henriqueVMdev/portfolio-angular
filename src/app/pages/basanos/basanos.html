@@ -47,14 +47,6 @@
             }
           </ul>
         </div>
-
-        <div class="blueprint-hero__preview">
-          <app-interface-preview [project]="project" />
-          <p class="blueprint-hero__preview-note">
-            <span>REVERSO</span>
-            Trabalhando nas previews
-          </p>
-        </div>
       </div>
 
       <a class="blueprint-hero__continue" [routerLink]="[]" fragment="planta-tecnica">
@@ -316,6 +308,9 @@
             </p>
           </div>
         </section>
+
+        <app-blueprint-contact [project]="project" />
+
 
         <footer class="blueprint-next" aria-labelledby="next-project-title">
           <div class="blueprint-next__register">

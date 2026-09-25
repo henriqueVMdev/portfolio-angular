@@ -48,13 +48,20 @@
           </ul>
         </div>
 
-        <div class="blueprint-hero__preview">
-          <app-interface-preview [project]="project" />
-          <p class="blueprint-hero__preview-note">
+        <section class="blueprint-reverse" aria-labelledby="results-title">
+          <h2 id="results-title" class="blueprint-reverse__title">
             <span>REVERSO</span>
-            Trabalhando nas previews
-          </p>
-        </div>
+            Resultados em produção
+          </h2>
+          <ul class="blueprint-reverse__list">
+            @for (result of results; track result.figure) {
+              <li>
+                <strong>{{ result.figure }}</strong>
+                <span>{{ result.caption }}</span>
+              </li>
+            }
+          </ul>
+        </section>
       </div>
 
       <a class="blueprint-hero__continue" [routerLink]="[]" fragment="planta-tecnica">
@@ -168,21 +175,6 @@
               </p>
             </article>
           </div>
-
-          <section class="myrias-results" aria-labelledby="results-title">
-            <header>
-              <h3 id="results-title">Resultados</h3>
-              <p class="myrias-overview__eyebrow">03 / MEDIÇÃO</p>
-            </header>
-            <ul>
-              @for (result of results; track result.figure) {
-                <li>
-                  <strong>{{ result.figure }}</strong>
-                  <span>{{ result.caption }}</span>
-                </li>
-              }
-            </ul>
-          </section>
 
           <div class="myrias-overview__complement">
             <p>
@@ -688,6 +680,9 @@
             }
           </ol>
         </section>
+
+        <app-blueprint-contact [project]="project" />
+
 
         <footer class="blueprint-next" aria-labelledby="next-project-title">
           <div class="blueprint-next__register">
