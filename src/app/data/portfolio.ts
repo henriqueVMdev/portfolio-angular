@@ -1,15 +1,3 @@
-export type DiagramNode = {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-};
-
-export type DiagramEdge = {
-  from: string;
-  to: string;
-};
-
 export type PortfolioProject = {
   slug: string;
   index: string;
@@ -26,7 +14,6 @@ export type PortfolioProject = {
   capabilities: string[];
   decisions: { title: string; body: string; cost?: string; gain?: string }[];
   endpoints: { method: string; path: string; purpose: string }[];
-  diagram: { nodes: DiagramNode[]; edges: DiagramEdge[] };
   preview: "operations" | "finance" | "observability" | "custody";
 };
 
@@ -197,19 +184,6 @@ export const projects: PortfolioProject[] = [
       },
       { method: "POST", path: "/api/webhooks", purpose: "aberta" },
     ],
-    diagram: {
-      nodes: [
-        { id: "client", label: "Cliente", x: 8, y: 38 },
-        { id: "api", label: "API", x: 34, y: 38 },
-        { id: "queue", label: "Fila", x: 61, y: 17 },
-        { id: "worker", label: "Workers", x: 61, y: 61 },
-        { id: "db", label: "PostgreSQL", x: 87, y: 38 },
-      ],
-      edges: [
-        { from: "client", to: "api" }, { from: "api", to: "queue" }, { from: "queue", to: "worker" },
-        { from: "worker", to: "db" }, { from: "api", to: "db" },
-      ],
-    },
     preview: "operations",
   },
   {
@@ -273,21 +247,6 @@ export const projects: PortfolioProject[] = [
       },
     ],
     endpoints: [],
-    diagram: {
-      nodes: [
-        { id: "sources", label: "Fontes", x: 8, y: 38 },
-        { id: "normalizer", label: "Normalização", x: 34, y: 38 },
-        { id: "engine", label: "Backtest", x: 61, y: 18 },
-        { id: "strategies", label: "Plugins", x: 61, y: 60 },
-        { id: "executor", label: "Executor", x: 87, y: 38 },
-      ],
-      edges: [
-        { from: "sources", to: "normalizer" },
-        { from: "normalizer", to: "engine" },
-        { from: "strategies", to: "engine" },
-        { from: "engine", to: "executor" },
-      ],
-    },
     preview: "finance",
   },
   {
@@ -349,21 +308,6 @@ export const projects: PortfolioProject[] = [
       },
     ],
     endpoints: [],
-    diagram: {
-      nodes: [
-        { id: "spa", label: "SPA Vue", x: 8, y: 38 },
-        { id: "supabase", label: "Supabase", x: 38, y: 38 },
-        { id: "auth", label: "Auth", x: 67, y: 16 },
-        { id: "storage", label: "Storage", x: 67, y: 60 },
-        { id: "db", label: "PostgreSQL", x: 90, y: 38 },
-      ],
-      edges: [
-        { from: "spa", to: "supabase" },
-        { from: "supabase", to: "auth" },
-        { from: "supabase", to: "storage" },
-        { from: "supabase", to: "db" },
-      ],
-    },
     preview: "custody",
   },
   {
@@ -399,10 +343,6 @@ export const projects: PortfolioProject[] = [
     ],
     decisions: [],
     endpoints: [],
-    diagram: {
-      nodes: [],
-      edges: [],
-    },
     preview: "observability",
   },
 ];
