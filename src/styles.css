@@ -3772,8 +3772,8 @@ video {
   line-height: 1.55;
 }
 
-/* Leitura em texto do diagrama. No desktop o SVG é legível e o bloco some,
-   a não ser que o diagrama falhe (aí ele já nasce aberto). */
+/* Leitura em texto do diagrama. Fica em toda largura: até no desktop os
+   diagramas largos encolhem para caber no card e o rótulo cai para ~7px. */
 .myrias-mermaid__text {
   margin-top: 0.9rem;
   border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
@@ -3817,12 +3817,6 @@ video {
   color: color-mix(in srgb, currentColor 84%, transparent);
   font-size: 0.95rem;
   line-height: 1.6;
-}
-
-@media (min-width: 681px) {
-  .myrias-mermaid__text:not([open]) {
-    display: none;
-  }
 }
 
 /* Mobile: em vez de rolar na horizontal (que lia como "cortado"), o diagrama
@@ -4021,7 +4015,7 @@ video {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: end;
   gap: clamp(2rem, 5vw, 5rem);
-  padding: var(--section-space) var(--page-gutter) clamp(3.5rem, 7vw, 6rem);
+  padding: var(--section-space) var(--page-gutter) clamp(2.5rem, 5vw, 4rem);
   background: var(--aegean-deep);
   color: var(--limestone);
 }
@@ -4043,6 +4037,10 @@ video {
   color: rgba(232, 225, 210, 0.74);
 }
 
+.blueprint-contact__actions .mint-link {
+  min-height: 2.75rem;
+}
+
 .blueprint-contact__actions {
   display: flex;
   flex-wrap: wrap;
@@ -4050,8 +4048,8 @@ video {
   margin-top: 1.6rem;
 }
 
-.blueprint-contact + .blueprint-next {
-  padding-top: clamp(3.5rem, 7vw, 6rem);
+app-blueprint-contact + .blueprint-next {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
   border-top: 1px solid var(--line-light);
 }
 

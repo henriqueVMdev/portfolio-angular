@@ -181,7 +181,7 @@
               O SaaS de terceiros foi cancelado depois que a ferramenta interna virou o padrão de operação da empresa.
             </p>
             <p class="project-overview__origin">
-              <em>Myrias</em> (μυριάς) era o dez mil dos gregos a maior quantidade que o sistema numérico deles nomeava. Acima disso, contava-se em miríades de miríades. O nome ficou no inglês <em>myriad</em> como "incontável"
+              <em>Myrias</em> (μυριάς) era o dez mil dos gregos: a maior quantidade que o sistema numérico deles nomeava. Acima disso, contava-se em miríades de miríades. O nome ficou no inglês <em>myriad</em> como "incontável".
             </p>
           </div>
         </section>
@@ -253,7 +253,7 @@
                 description="A varredura das 00:30 é a única do dia e traz o catálogo inteiro para o espelho. A edição pelo painel grava o anúncio que o próprio PUT devolveu, sem chamada extra. Os webhooks entram numa fila Redis deduplicada por anúncio e atualizam a linha. Inventário, qualidade, concorrência, promoções, vendas e automações leem do espelho em SQL, sem chamar a API."
               />
               <figcaption>
-                As telas leem com SELECT e WHERE, sem chamar a API. Três varreduras concorrentes viraram uma, e o custo está escrito: enquanto o webhook não chega, o dado é de ontem.
+                As telas leem com SELECT e WHERE, sem chamar a API. Quatro varreduras concorrentes viraram uma, e o custo está escrito: enquanto o webhook não chega, o dado é de ontem.
               </figcaption>
             </figure>
 
@@ -699,7 +699,7 @@
           <app-blueprint-link
             [href]="'/projetos/' + next.slug"
             class="blueprint-next__link"
-            [label]="'Abrir a planta do projeto ' + next.name"
+            [label]="'Examinar próxima planta: ' + next.name"
           >
             <span>Examinar próxima planta</span>
             <span aria-hidden="true">

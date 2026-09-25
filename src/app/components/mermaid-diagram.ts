@@ -59,7 +59,7 @@ function renderDiagram(id: string, definition: string) {
         </p>
       }
     </div>
-    <!-- No celular o SVG encolhe até o rótulo ficar ilegível: o texto é a leitura real.
+    <!-- O SVG encolhe para caber no card e o rótulo fica ilegível: o texto é a leitura real.
          É também a descrição do role=img, então o leitor de tela não ouve duas vezes. -->
     @if (description()) {
       <details class="myrias-mermaid__text" [open]="failed()">

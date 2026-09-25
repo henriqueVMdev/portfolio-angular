@@ -72,7 +72,7 @@ export const projects: PortfolioProject[] = [
       {
         title: "O catálogo do marketplace espelhado numa tabela local",
         body:
-          "Cada tela perguntava ao Mercado Livre, e três varreduras noturnas concorrentes estouravam a memória do host. A varredura das 00:30 passou a ser a única fonte, e as demais telas leem dela em SQL.",
+          "Cada tela perguntava ao Mercado Livre, e quatro varreduras noturnas concorrentes estouravam a memória do host. A varredura das 00:30 passou a ser a única fonte, e as demais telas leem dela em SQL.",
         cost:
           "O dado é de ontem até o webhook chegar, e a tabela vira uma segunda fonte de verdade que pode divergir do marketplace.",
         gain:
