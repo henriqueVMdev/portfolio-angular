@@ -58,10 +58,26 @@
               <p class="project-stratum__summary">{{ project.summary }}</p>
             </header>
 
-            <figure class="project-stratum__media" data-project-media>
-              <app-interface-preview [project]="project" [compact]="true" />
-              <figcaption>Preview de {{ project.name }} em preparação</figcaption>
-            </figure>
+            @if (project.results) {
+              <section
+                class="project-stratum__media blueprint-reverse"
+                data-project-media
+                [attr.aria-labelledby]="'project-' + project.slug + '-results'"
+              >
+                <h4 [id]="'project-' + project.slug + '-results'" class="blueprint-reverse__title">
+                  <span>REVERSO</span>
+                  Resultados em produção
+                </h4>
+                <ul class="blueprint-reverse__list">
+                  @for (result of project.results; track result.figure) {
+                    <li>
+                      <strong>{{ result.figure }}</strong>
+                      <span>{{ result.caption }}</span>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
 
             <div class="project-stratum__evidence">
               <p class="project-stratum__notice">{{ project.placeholderNotice }}</p>

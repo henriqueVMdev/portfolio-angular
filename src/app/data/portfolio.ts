@@ -1,3 +1,5 @@
+import { myriasResults } from "./myrias-content";
+
 export type PortfolioProject = {
   slug: string;
   index: string;
@@ -14,7 +16,8 @@ export type PortfolioProject = {
   capabilities: string[];
   decisions: { title: string; body: string; cost?: string; gain?: string }[];
   endpoints: { method: string; path: string; purpose: string }[];
-  preview: "operations" | "finance" | "observability" | "custody";
+  /** Números medidos em produção. Só entra projeto que tem medição real. */
+  results?: { figure: string; caption: string }[];
 };
 
 export const profile = {
@@ -183,7 +186,7 @@ export const projects: PortfolioProject[] = [
       },
       { method: "POST", path: "/api/webhooks", purpose: "aberta" },
     ],
-    preview: "operations",
+    results: myriasResults,
   },
   {
     slug: "basanos",
@@ -246,7 +249,6 @@ export const projects: PortfolioProject[] = [
       },
     ],
     endpoints: [],
-    preview: "finance",
   },
   {
     slug: "omniseg",
@@ -307,7 +309,6 @@ export const projects: PortfolioProject[] = [
       },
     ],
     endpoints: [],
-    preview: "custody",
   },
   {
     slug: "kairos",
@@ -342,7 +343,6 @@ export const projects: PortfolioProject[] = [
     ],
     decisions: [],
     endpoints: [],
-    preview: "observability",
   },
 ];
 
